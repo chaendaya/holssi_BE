@@ -1,6 +1,6 @@
 package org.example.holssi_be.controller;
 
-import org.example.holssi_be.service.VerificationService;
+import org.example.holssi_be.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,15 +10,15 @@ import java.util.Map;
 @RequestMapping("/member")
 public class RedisController {
     @Autowired
-    private VerificationService verificationService;
+    private AuthService authService;
 
     @GetMapping
     public Map<Object, Object> getUserData(@RequestParam String email) {
-        return verificationService.getTemporaryUser(email);
+        return authService.getTemporaryUser(email);
     }
 
     @DeleteMapping
     public boolean deleteUserData(@RequestParam String email) {
-        return verificationService.deleteTemporaryUser(email);
+        return authService.deleteTemporaryUser(email);
     }
 }

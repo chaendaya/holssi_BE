@@ -1,12 +1,13 @@
 package org.example.holssi_be.controller;
 
+import org.example.holssi_be.dto.ResponseDTO;
 import org.example.holssi_be.dto.UserDTO;
-import org.example.holssi_be.dto.request.EmailRequestDTO;
-import org.example.holssi_be.dto.request.VerifyEmailDTO;
+import org.example.holssi_be.dto.auth.IdentifierDTO;
+import org.example.holssi_be.dto.auth.AuthDTO;
 import org.example.holssi_be.entity.domain.Users;
 import org.example.holssi_be.service.EmailService;
 import org.example.holssi_be.service.UserService;
-import org.example.holssi_be.service.VerificationService;
+import org.example.holssi_be.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,11 +18,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     @Autowired
-    private VerificationService verificationService;
+    private AuthService authService;
 
     @Autowired
     private EmailService emailService;
@@ -32,8 +33,8 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/register")
-    public String register(@RequestBody UserDTO userDTO) {
+    @PostMapping("/user")
+    public ResponseDTO user(@RequestBody UserDTO userDTO) {
         Map<String, String> userData = new HashMap<>();
         userData.put("name", userDTO.getName());
         userData.put("userEmail", userDTO.getUserEmail());
@@ -43,34 +44,35 @@ public class AuthController {
         userData.put("account", userDTO.getAccount());
         userData.put("bank", userDTO.getBank());
 
-        verificationService.saveTemporaryUser(userDTO.getUserEmail(), userData);
-        return "Choose verification method: email or whatsapp";
+        authService.saveTemporaryUser(userDTO.getUserEmail(), userData);
+        return new ResponseDTO(true, null, null);
     }
 
     @PostMapping("/sendEmail")
-    public String sendEmail(@RequestBody EmailRequestDTO emailRequestDTO) {
-        String email = emailRequestDTO.getEmail();
-        String code = verificationService.generateVerificationCode();
-        emailService.sendVerificationEmail(email, code);
-        verificationService.saveVerificationCode(email, code);
-        return "Verification code sent via email.";
+    public ResponseDTO sendEmail(@RequestBody IdentifierDTO identifierDTO) {
+        String email = identifierDTO.getEmail();
+        String code = authService.generateCode();
+        emailService.sendEmail(email, code);
+        authService.saveCode(email, code);
+        return new ResponseDTO(true, "Verification code sent via email.", null);
     }
 
     /*@PostMapping("/sendWhatsApp")
-    public String sendWhatsApp(@RequestParam String phone) {
-        String code = verificationService.generateVerificationCode();
-        whatsAppService.sendVerificationCode(phone, code);
-        verificationService.saveVerificationCode(phone, code);
-        return "Verification code sent via WhatsApp.";
+    public String sendWhatsApp(@RequestBody IdentifierDTO identifierDTO) {
+        String phone = identifierDTO.getEmail();
+        String code = authService.generateCode();
+        whatsAppService.sendCode(phone, code);
+        authService.saveCode(phone, code);
+        return new ResponseDTO(true, "Verification code sent via WhatsApp.", null);
     }*/
 
     @PostMapping("/verifyEmail")
-    public boolean verifyEmail(@RequestBody VerifyEmailDTO verifyEmailDTO) {
-        String email = verifyEmailDTO.getEmail();
-        String code = verifyEmailDTO.getCode();
-        boolean verified = verificationService.verifyCode(email, code);
+    public boolean verifyEmail(@RequestBody AuthDTO authDTO) {
+        String email = authDTO.getIdentifier();
+        String code = authDTO.getCode();
+        boolean verified = authService.verifyCode(email, code);
         if (verified) {
-            Map<Object, Object> userData = verificationService.getTemporaryUser(email);
+            Map<Object, Object> userData = authService.getTemporaryUser(email);
             if (!userData.isEmpty()) {
                 Users user = new Users();
                 user.setName((String) userData.get("name"));
@@ -82,10 +84,10 @@ public class AuthController {
                 user.setBank((String) userData.get("bank"));
                 user.setVerified(true);
                 userService.save(user);
-                verificationService.deleteTemporaryUser(email);
+                authService.deleteTemporaryUser(email);
             }
         } else {
-            verificationService.deleteTemporaryUser(email); // 인증 실패 시 임시 데이터 삭제
+            authService.deleteTemporaryUser(email); // 인증 실패 시 임시 데이터 삭제
         }
         return verified;
     }
