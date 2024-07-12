@@ -9,7 +9,7 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class VerificationService {
+public class AuthService {
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
@@ -17,13 +17,13 @@ public class VerificationService {
     private final Random random = new Random();
 
     // 인증번호 생성
-    public String generateVerificationCode() {
+    public String generateCode() {
         int code = 1000 + random.nextInt(9000);
         return String.valueOf(code);
     }
 
     // 인증번호 저장
-    public void saveVerificationCode(String identifier, String code) {
+    public void saveCode(String identifier, String code) {
         redisTemplate.opsForValue().set(identifier, code, 5, TimeUnit.MINUTES); // 5분 동안 인증번호 유효
     }
 
