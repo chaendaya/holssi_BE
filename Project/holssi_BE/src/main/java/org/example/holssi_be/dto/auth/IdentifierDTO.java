@@ -4,5 +4,6 @@ import lombok.Data;
 
 @Data
 public class IdentifierDTO {
-    private String email;
+    private String primaryKey;  // email
+    private String identifier;
 }
