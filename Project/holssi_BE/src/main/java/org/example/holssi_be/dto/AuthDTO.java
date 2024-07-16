@@ -1,4 +1,4 @@
-package org.example.holssi_be.dto.auth;
+package org.example.holssi_be.dto;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;

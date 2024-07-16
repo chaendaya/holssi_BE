@@ -3,7 +3,7 @@ package org.example.holssi_be.controller;
 import jakarta.validation.Valid;
 import org.example.holssi_be.dto.ResponseDTO;
 import org.example.holssi_be.dto.UserDTO;
-import org.example.holssi_be.dto.auth.AuthDTO;
+import org.example.holssi_be.dto.AuthDTO;
 import org.example.holssi_be.entity.domain.Users;
 import org.example.holssi_be.service.AuthService;
 import org.example.holssi_be.service.EmailService;
