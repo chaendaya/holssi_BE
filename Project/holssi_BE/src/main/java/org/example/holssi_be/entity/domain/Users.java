@@ -30,6 +30,4 @@ public class Users {
     @Column(name = "bank", nullable = false, length = 255)
     private String bank;
 
-    @Column(name = "verified", nullable = false)
-    private boolean verified;
 }
