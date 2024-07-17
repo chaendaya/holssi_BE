@@ -1,14 +1,15 @@
 package org.example.holssi_be.controller;
 
 import jakarta.validation.Valid;
+import org.example.holssi_be.dto.AuthDTO;
 import org.example.holssi_be.dto.ResponseDTO;
 import org.example.holssi_be.dto.UserDTO;
-import org.example.holssi_be.dto.AuthDTO;
-import org.example.holssi_be.entity.domain.Users;
 import org.example.holssi_be.service.AuthService;
 import org.example.holssi_be.service.EmailService;
 import org.example.holssi_be.service.UserService;
 import org.example.holssi_be.service.WhatsAppService;
+import org.example.holssi_be.util.AuthUtil;
+import org.example.holssi_be.util.ValidationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -36,38 +36,20 @@ public class AuthController {
     private UserService userService;
 
     @PostMapping("/user")
-    public ResponseDTO user(@RequestBody @Valid UserDTO userDTO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return new ResponseDTO(false, null, bindingResult.getFieldError().getDefaultMessage());
-        }
+    public ResponseDTO registerUser(@RequestBody @Valid UserDTO userDTO, BindingResult bindingResult) {
+        ValidationUtil.validateRequest(bindingResult);
 
-        Map<String, String> userData = new HashMap<>();
-        userData.put("name", userDTO.getName());
-        userData.put("userEmail", userDTO.getUserEmail());
-        userData.put("password", userDTO.getPassword());
-        userData.put("phone", userDTO.getPhone());
-        userData.put("address", userDTO.getAddress());
-        userData.put("account", userDTO.getAccount());
-        userData.put("bank", userDTO.getBank());
-
+        Map<String, String> userData = AuthUtil.createTemporaryUser(userDTO);
         authService.saveTemporaryUser(userDTO.getUserEmail(), userData);
         return new ResponseDTO(true, null, null);
     }
 
     @PostMapping("/sendEmail")
     public ResponseDTO sendEmail(@RequestBody @Valid AuthDTO authDTO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return new ResponseDTO(false, null, bindingResult.getFieldError().getDefaultMessage());
-        }
-
-        String identifier = authDTO.getPrimaryKey();
+        ValidationUtil.validateRequest(bindingResult);
 
         // 임시 사용자 데이터 가져오기
-        Map<Object, Object> userData = authService.getTemporaryUser(identifier);
-        if (userData.isEmpty()) {
-            return new ResponseDTO(false, null, "Temporary user data not found.");
-        }
-
+        Map<Object, Object> userData = AuthUtil.getTemporaryUser(authDTO.getPrimaryKey(), authService);
         String email = (String) userData.get("userEmail");
         String code = authService.generateCode();
 
@@ -78,18 +60,10 @@ public class AuthController {
 
     @PostMapping("/sendWhatsApp")
     public ResponseDTO sendWhatsApp(@RequestBody @Valid AuthDTO authDTO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return new ResponseDTO(false, null, bindingResult.getFieldError().getDefaultMessage());
-        }
-
-        String identifier = authDTO.getPrimaryKey();
+        ValidationUtil.validateRequest(bindingResult);
 
         // 임시 사용자 데이터 가져오기
-        Map<Object, Object> userData = authService.getTemporaryUser(identifier);
-        if (userData.isEmpty()) {
-            return new ResponseDTO(false, null, "Temporary user data not found.");
-        }
-
+        Map<Object, Object> userData = AuthUtil.getTemporaryUser(authDTO.getPrimaryKey(), authService);
         String phone = (String) userData.get("phone");
         String code = authService.generateCode();
 
@@ -100,74 +74,25 @@ public class AuthController {
 
     @PostMapping("/verifyEmail")
     public ResponseDTO verifyEmail(@RequestBody @Valid AuthDTO authDTO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return new ResponseDTO(false, null, bindingResult.getFieldError().getDefaultMessage());
-        }
-
-        String identifier = authDTO.getPrimaryKey();
+        ValidationUtil.validateRequest(bindingResult);
 
         // 임시 사용자 데이터 가져오기
-        Map<Object, Object> userData = authService.getTemporaryUser(identifier);
-        if (userData.isEmpty()) {
-            return new ResponseDTO(false, null, "Temporary user data not found.");
-        }
-
-
+        Map<Object, Object> userData = AuthUtil.getTemporaryUser(authDTO.getPrimaryKey(), authService);
         String email = (String) userData.get("userEmail");
-        String code = authDTO.getCode();
+        boolean verified = authService.verifyCode(email, authDTO.getCode());
 
-        boolean verified = authService.verifyCode(email, code);
-        if (verified && !userData.isEmpty()) {
-            Users user = new Users();
-            user.setName((String) userData.get("name"));
-            user.setUserEmail((String) userData.get("userEmail"));
-            user.setPassword((String) userData.get("password"));
-            user.setPhone((String) userData.get("phone"));
-            user.setAddress((String) userData.get("address"));
-            user.setAccount((String) userData.get("account"));
-            user.setBank((String) userData.get("bank"));
-            userService.save(user);
-            authService.deleteTemporaryUser(identifier);
-        } else {
-            authService.deleteTemporaryUser(identifier); // 인증 실패 시 임시 데이터 삭제
-            return new ResponseDTO(false, null, "Verification Code does not match.");
-        }
-        return new ResponseDTO(true, "Verification Completed.", null);
+        return AuthUtil.createVerifiedUser(verified, userData, authDTO.getPrimaryKey(), userService, authService);
     }
 
     @PostMapping("/verifyWhatsApp")
     public ResponseDTO verifyWhatsApp(@RequestBody @Valid AuthDTO authDTO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return new ResponseDTO(false, null, bindingResult.getFieldError().getDefaultMessage());
-        }
-
-        String identifier = authDTO.getPrimaryKey();
+        ValidationUtil.validateRequest(bindingResult);
 
         // 임시 사용자 데이터 가져오기
-        Map<Object, Object> userData = authService.getTemporaryUser(identifier);
-        if (userData.isEmpty()) {
-            return new ResponseDTO(false, null, "Temporary user data not found.");
-        }
-
+        Map<Object, Object> userData = AuthUtil.getTemporaryUser(authDTO.getPrimaryKey(), authService);
         String phone = (String) userData.get("phone");
-        String code = authDTO.getCode();
+        boolean verified = authService.verifyCode(phone, authDTO.getCode());
 
-        boolean verified = authService.verifyCode(phone, code);
-        if (verified && !userData.isEmpty()) {
-            Users user = new Users();
-            user.setName((String) userData.get("name"));
-            user.setUserEmail((String) userData.get("userEmail"));
-            user.setPassword((String) userData.get("password"));
-            user.setPhone((String) userData.get("phone"));
-            user.setAddress((String) userData.get("address"));
-            user.setAccount((String) userData.get("account"));
-            user.setBank((String) userData.get("bank"));
-            userService.save(user);
-            authService.deleteTemporaryUser(identifier);
-        } else {
-            authService.deleteTemporaryUser(identifier); // 인증 실패 시 임시 데이터 삭제
-            return new ResponseDTO(false, null, "Verification Code does not match.");
-        }
-        return new ResponseDTO(true, "Verification Completed.", null);
+        return AuthUtil.createVerifiedUser(verified, userData, authDTO.getPrimaryKey(), userService, authService);
     }
 }
