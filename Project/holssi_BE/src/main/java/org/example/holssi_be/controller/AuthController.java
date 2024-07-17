@@ -1,12 +1,11 @@
 package org.example.holssi_be.controller;
 
+import jakarta.validation.Valid;
 import org.example.holssi_be.dto.AuthDTO;
+import org.example.holssi_be.dto.CollectorDTO;
 import org.example.holssi_be.dto.ResponseDTO;
 import org.example.holssi_be.dto.UserDTO;
-import org.example.holssi_be.service.AuthService;
-import org.example.holssi_be.service.EmailService;
-import org.example.holssi_be.service.UserService;
-import org.example.holssi_be.service.WhatsAppService;
+import org.example.holssi_be.service.*;
 import org.example.holssi_be.util.AuthUtil;
 import org.example.holssi_be.util.ValidationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import jakarta.validation.Valid;
+
 import java.util.Map;
 
 @RestController
@@ -34,6 +33,9 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private CollectorService collectorService;
+
     @PostMapping("/user")
     public ResponseDTO registerUser(@RequestBody @Valid UserDTO userDTO, BindingResult bindingResult) {
         ValidationUtil.validateRequest(bindingResult);
@@ -43,13 +45,20 @@ public class AuthController {
         return new ResponseDTO(true, null, null);
     }
 
+    @PostMapping("/collector")
+    public ResponseDTO registerCollector(@RequestBody @Valid CollectorDTO collectorDTO, BindingResult bindingResult){
+        ValidationUtil.validateRequest(bindingResult);
+
+        Map<String, String> collectorData = AuthUtil.createTemporaryCollector(collectorDTO);
+        authService.saveTemporaryCollector(collectorDTO.getCollectorEmail(), collectorData);
+        return new ResponseDTO(true, null, null);
+    }
+
     @PostMapping("/sendEmail")
     public ResponseDTO sendEmail(@RequestBody @Valid AuthDTO authDTO, BindingResult bindingResult) {
         ValidationUtil.validateRequest(bindingResult);
 
-        // 임시 사용자 데이터 가져오기
-        Map<Object, Object> userData = AuthUtil.getTemporaryUser(authDTO.getPrimaryKey(), authService);
-        String email = (String) userData.get("userEmail");
+        String email = AuthUtil.getEmailByRole(authDTO, authService);
         String code = authService.generateCode();
 
         emailService.sendEmail(email, code);
@@ -61,9 +70,7 @@ public class AuthController {
     public ResponseDTO sendWhatsApp(@RequestBody @Valid AuthDTO authDTO, BindingResult bindingResult) {
         ValidationUtil.validateRequest(bindingResult);
 
-        // 임시 사용자 데이터 가져오기
-        Map<Object, Object> userData = AuthUtil.getTemporaryUser(authDTO.getPrimaryKey(), authService);
-        String phone = (String) userData.get("phone");
+        String phone = AuthUtil.getPhoneByRole(authDTO, authService);
         String code = authService.generateCode();
 
         whatsAppService.sendWhatsApp(phone, code);
@@ -75,23 +82,19 @@ public class AuthController {
     public ResponseDTO verifyEmail(@RequestBody @Valid AuthDTO authDTO, BindingResult bindingResult) {
         ValidationUtil.validateRequest(bindingResult);
 
-        // 임시 사용자 데이터 가져오기
-        Map<Object, Object> userData = AuthUtil.getTemporaryUser(authDTO.getPrimaryKey(), authService);
-        String email = (String) userData.get("userEmail");
+        String email = AuthUtil.getEmailByRole(authDTO, authService);
         boolean verified = authService.verifyCode(email, authDTO.getCode());
 
-        return AuthUtil.createVerifiedUser(verified, userData, authDTO.getPrimaryKey(), userService, authService);
+        return AuthUtil.verificationResult(authDTO, verified, userService, collectorService, authService);
     }
 
     @PostMapping("/verifyWhatsApp")
     public ResponseDTO verifyWhatsApp(@RequestBody @Valid AuthDTO authDTO, BindingResult bindingResult) {
         ValidationUtil.validateRequest(bindingResult);
 
-        // 임시 사용자 데이터 가져오기
-        Map<Object, Object> userData = AuthUtil.getTemporaryUser(authDTO.getPrimaryKey(), authService);
-        String phone = (String) userData.get("phone");
+        String phone = AuthUtil.getPhoneByRole(authDTO, authService);
         boolean verified = authService.verifyCode(phone, authDTO.getCode());
 
-        return AuthUtil.createVerifiedUser(verified, userData, authDTO.getPrimaryKey(), userService, authService);
+        return AuthUtil.verificationResult(authDTO, verified, userService, collectorService, authService);
     }
 }

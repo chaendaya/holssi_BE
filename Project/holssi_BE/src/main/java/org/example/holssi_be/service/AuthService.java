@@ -33,22 +33,38 @@ public class AuthService {
         return code.equals(cachedCode);
     }
 
-    // 임시 사용자 데이터 저장
+    // 임시 데이터 저장
     public void saveTemporaryUser(String identifier, Map<String, String> userData) {
         String key = "tempUser:" + identifier;
         redisTemplate.opsForHash().putAll(key, userData);
         redisTemplate.expire(key, 10, TimeUnit.MINUTES); // 10분 동안 유효
     }
 
-    // 임시 사용자 데이터 가져오기
+    public void saveTemporaryCollector(String identifier, Map<String, String> collectorData) {
+        String key = "tempCollector:" + identifier;
+        redisTemplate.opsForHash().putAll(key, collectorData);
+        redisTemplate.expire(key, 10, TimeUnit.MINUTES); // 10분 동안 유효
+    }
+
+    // 임시 데이터 가져오기
     public Map<Object, Object> getTemporaryUser(String identifier) {
         String key = "tempUser:" + identifier;
         return redisTemplate.opsForHash().entries(key);
     }
 
-    // 임시 사용자 데이터 삭제
+    public Map<Object, Object> getTemporaryCollector(String identifier) {
+        String key = "tempCollector:" + identifier;
+        return redisTemplate.opsForHash().entries(key);
+    }
+
+    // 임시 데이터 삭제
     public boolean deleteTemporaryUser(String identifier) {
         String key = "tempUser:" + identifier;
+        return redisTemplate.delete(key); // 삭제 성공 여부를 반환
+    }
+
+    public boolean deleteTemporaryCollector(String identifier) {
+        String key = "tempCollector:" + identifier;
         return redisTemplate.delete(key); // 삭제 성공 여부를 반환
     }
 }

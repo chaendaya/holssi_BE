@@ -8,6 +8,9 @@ import lombok.Setter;
 @Setter
 public class AuthDTO {
 
+    @NotEmpty(message = "Role cannot be empty")
+    private String role;
+
     @NotEmpty(message = "Primary key cannot be empty")
     private String primaryKey;
 
