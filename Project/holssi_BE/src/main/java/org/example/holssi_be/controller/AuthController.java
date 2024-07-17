@@ -1,6 +1,5 @@
 package org.example.holssi_be.controller;
 
-import jakarta.validation.Valid;
 import org.example.holssi_be.dto.AuthDTO;
 import org.example.holssi_be.dto.ResponseDTO;
 import org.example.holssi_be.dto.UserDTO;
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import jakarta.validation.Valid;
 import java.util.Map;
 
 @RestController
