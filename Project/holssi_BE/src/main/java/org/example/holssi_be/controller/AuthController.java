@@ -60,23 +60,17 @@ public class AuthController {
             return new ResponseDTO(false, null, bindingResult.getFieldError().getDefaultMessage());
         }
 
-        String key = authDTO.getPrimaryKey();
-        String email = authDTO.getIdentifier();
+        String identifier = authDTO.getPrimaryKey();
 
         // 임시 사용자 데이터 가져오기
-        Map<Object, Object> userData = authService.getTemporaryUser(key);
-
+        Map<Object, Object> userData = authService.getTemporaryUser(identifier);
         if (userData.isEmpty()) {
             return new ResponseDTO(false, null, "Temporary user data not found.");
         }
 
-        // 요청 바디의 identifier와 임시 사용자 데이터의 email 비교
-        String storedEmail = (String) userData.get("userEmail");
-        if (!email.equals(storedEmail)) {
-            return new ResponseDTO(false, null, "Email does not match.");
-        }
-
+        String email = (String) userData.get("userEmail");
         String code = authService.generateCode();
+
         emailService.sendEmail(email, code);
         authService.saveCode(email, code);
         return new ResponseDTO(true, "Verification code sent via email.", null);
@@ -88,23 +82,17 @@ public class AuthController {
             return new ResponseDTO(false, null, bindingResult.getFieldError().getDefaultMessage());
         }
 
-        String key = authDTO.getPrimaryKey();
-        String phone = authDTO.getIdentifier();
+        String identifier = authDTO.getPrimaryKey();
 
         // 임시 사용자 데이터 가져오기
-        Map<Object, Object> userData = authService.getTemporaryUser(key);
-
+        Map<Object, Object> userData = authService.getTemporaryUser(identifier);
         if (userData.isEmpty()) {
             return new ResponseDTO(false, null, "Temporary user data not found.");
         }
 
-        // 요청 바디의 identifier와 임시 사용자 데이터의 phone 비교
-        String storedPhone = (String) userData.get("phone");
-        if (!phone.equals(storedPhone)) {
-            return new ResponseDTO(false, null, "Phone number does not match.");
-        }
-
+        String phone = (String) userData.get("phone");
         String code = authService.generateCode();
+
         whatsAppService.sendWhatsApp(phone, code);
         authService.saveCode(phone, code);
         return new ResponseDTO(true, "Verification code sent via WhatsApp.", null);
@@ -116,23 +104,18 @@ public class AuthController {
             return new ResponseDTO(false, null, bindingResult.getFieldError().getDefaultMessage());
         }
 
-        String key = authDTO.getPrimaryKey();
-        String email = authDTO.getIdentifier();
+        String identifier = authDTO.getPrimaryKey();
 
         // 임시 사용자 데이터 가져오기
-        Map<Object, Object> userData = authService.getTemporaryUser(key);
-
+        Map<Object, Object> userData = authService.getTemporaryUser(identifier);
         if (userData.isEmpty()) {
             return new ResponseDTO(false, null, "Temporary user data not found.");
         }
 
-        // 요청 바디의 identifier와 임시 사용자 데이터의 email 비교
-        String storedEmail = (String) userData.get("userEmail");
-        if (!email.equals(storedEmail)) {
-            return new ResponseDTO(false, null, "Email does not match.");
-        }
 
+        String email = (String) userData.get("userEmail");
         String code = authDTO.getCode();
+
         boolean verified = authService.verifyCode(email, code);
         if (verified && !userData.isEmpty()) {
             Users user = new Users();
@@ -144,9 +127,9 @@ public class AuthController {
             user.setAccount((String) userData.get("account"));
             user.setBank((String) userData.get("bank"));
             userService.save(user);
-            authService.deleteTemporaryUser(key);
+            authService.deleteTemporaryUser(identifier);
         } else {
-            authService.deleteTemporaryUser(key); // 인증 실패 시 임시 데이터 삭제
+            authService.deleteTemporaryUser(identifier); // 인증 실패 시 임시 데이터 삭제
             return new ResponseDTO(false, null, "Verification Code does not match.");
         }
         return new ResponseDTO(true, "Verification Completed.", null);
@@ -158,23 +141,17 @@ public class AuthController {
             return new ResponseDTO(false, null, bindingResult.getFieldError().getDefaultMessage());
         }
 
-        String key = authDTO.getPrimaryKey();
-        String phone = authDTO.getIdentifier();
+        String identifier = authDTO.getPrimaryKey();
 
         // 임시 사용자 데이터 가져오기
-        Map<Object, Object> userData = authService.getTemporaryUser(key);
-
+        Map<Object, Object> userData = authService.getTemporaryUser(identifier);
         if (userData.isEmpty()) {
             return new ResponseDTO(false, null, "Temporary user data not found.");
         }
 
-        // 요청 바디의 identifier와 임시 사용자 데이터의 phone 비교
-        String storedPhone = (String) userData.get("phone");
-        if (!phone.equals(storedPhone)) {
-            return new ResponseDTO(false, null, "Phone number does not match.");
-        }
-
+        String phone = (String) userData.get("phone");
         String code = authDTO.getCode();
+
         boolean verified = authService.verifyCode(phone, code);
         if (verified && !userData.isEmpty()) {
             Users user = new Users();
@@ -186,9 +163,9 @@ public class AuthController {
             user.setAccount((String) userData.get("account"));
             user.setBank((String) userData.get("bank"));
             userService.save(user);
-            authService.deleteTemporaryUser(key);
+            authService.deleteTemporaryUser(identifier);
         } else {
-            authService.deleteTemporaryUser(key); // 인증 실패 시 임시 데이터 삭제
+            authService.deleteTemporaryUser(identifier); // 인증 실패 시 임시 데이터 삭제
             return new ResponseDTO(false, null, "Verification Code does not match.");
         }
         return new ResponseDTO(true, "Verification Completed.", null);
