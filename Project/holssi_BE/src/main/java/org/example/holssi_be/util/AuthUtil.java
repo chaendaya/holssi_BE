@@ -40,18 +40,22 @@ public class AuthUtil {
     }
 
     public static ResponseDTO createVerifiedUser(boolean verified, Map<Object, Object> userData, String identifier, UserService userService, AuthService authService) {
-        if (verified && !userData.isEmpty()) {
-            Users user = new Users();
-            user.setName((String) userData.get("name"));
-            user.setUserEmail((String) userData.get("userEmail"));
-            user.setPassword((String) userData.get("password"));
-            user.setPhone((String) userData.get("phone"));
-            user.setAddress((String) userData.get("address"));
-            user.setAccount((String) userData.get("account"));
-            user.setBank((String) userData.get("bank"));
-            userService.save(user);
-            authService.deleteTemporaryUser(identifier);
-            return new ResponseDTO(true, "Verification Completed.", null);
+        if (verified) {
+            if(!userData.isEmpty()){
+                Users user = new Users();
+                user.setName((String) userData.get("name"));
+                user.setUserEmail((String) userData.get("userEmail"));
+                user.setPassword((String) userData.get("password"));
+                user.setPhone((String) userData.get("phone"));
+                user.setAddress((String) userData.get("address"));
+                user.setAccount((String) userData.get("account"));
+                user.setBank((String) userData.get("bank"));
+                userService.save(user);
+                authService.deleteTemporaryUser(identifier);
+                return new ResponseDTO(true, "Verification Completed.", null);
+            }
+            else
+                throw new InvalidUserException("Temporary user data not found.");
         } else {
             authService.deleteTemporaryUser(identifier);
             throw new VerificationException("Verification Code does not match.");
