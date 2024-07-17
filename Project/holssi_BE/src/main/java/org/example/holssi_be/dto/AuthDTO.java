@@ -11,9 +11,6 @@ public class AuthDTO {
     @NotEmpty(message = "Primary key cannot be empty")
     private String primaryKey;
 
-    @NotEmpty(message = "Identifier cannot be empty")
-    private String identifier;
-
     private String code;
 
     // 기본 생성자
