@@ -1,18 +1,21 @@
 package org.example.holssi_be.entity.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "USERS")
-public class Users {
+@Table(name = "COLLECTORS")
+public class Collectors {
 
     @Column(name = "name", nullable = false, length = 255)
     private String name;
 
     @Id
-    @Column(name = "user_email", nullable = false, length = 255)
+    @Column(name = "collector_email", nullable = false, length = 255)
     private String email;
 
     @Column(name = "password", nullable = false, length = 255)
@@ -23,11 +26,5 @@ public class Users {
 
     @Column(name = "address", nullable = false, length = 255)
     private String address;
-
-    @Column(name = "account", nullable = false, length = 255)
-    private String account;
-
-    @Column(name = "bank", nullable = false, length = 255)
-    private String bank;
 
 }

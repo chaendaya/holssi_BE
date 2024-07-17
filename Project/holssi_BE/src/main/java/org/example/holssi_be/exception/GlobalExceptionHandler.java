@@ -9,14 +9,20 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(InvalidUserException.class)
-    public ResponseEntity<ResponseDTO> handleInvalidUserException(InvalidUserException ex) {
+    @ExceptionHandler(InvalidMemException.class)
+    public ResponseEntity<ResponseDTO> handleInvalidMemException(InvalidMemException ex) {
         ResponseDTO response = new ResponseDTO(false, null, ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(VerificationException.class)
     public ResponseEntity<ResponseDTO> handleVerificationException(VerificationException ex) {
+        ResponseDTO response = new ResponseDTO(false, null, ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidRoleException.class)
+    public ResponseEntity<ResponseDTO> handleInvalidRoleException(InvalidRoleException ex) {
         ResponseDTO response = new ResponseDTO(false, null, ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }

@@ -1,6 +1,6 @@
 package org.example.holssi_be.util;
 
-import org.example.holssi_be.exception.InvalidUserException;
+import org.example.holssi_be.exception.InvalidMemException;
 import org.springframework.validation.BindingResult;
 
 public class ValidationUtil {
@@ -8,7 +8,7 @@ public class ValidationUtil {
 
     public static void validateRequest(BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new InvalidUserException(bindingResult.getFieldError().getDefaultMessage());
+            throw new InvalidMemException(bindingResult.getFieldError().getDefaultMessage());
         }
     }
 }
