@@ -5,9 +5,11 @@ import org.example.holssi_be.dto.CollectorDTO;
 import org.example.holssi_be.dto.ResponseDTO;
 import org.example.holssi_be.dto.UserDTO;
 import org.example.holssi_be.entity.domain.Collectors;
+import org.example.holssi_be.entity.domain.Member;
 import org.example.holssi_be.entity.domain.Users;
 import org.example.holssi_be.exception.InvalidMemException;
 import org.example.holssi_be.exception.InvalidRoleException;
+import org.example.holssi_be.repository.MemberRepository;
 import org.example.holssi_be.service.AuthService;
 import org.example.holssi_be.service.CollectorService;
 import org.example.holssi_be.service.UserService;
@@ -74,11 +76,11 @@ public class AuthUtil {
 
         switch (role) {
             case "user":
-                Map<Object, Object> userData = getTemporaryUser(authDTO.getPrimaryKey(), authService);
+                Map<Object, Object> userData = getTemporaryUser(authDTO.getTempKey(), authService);
                 email = (String) userData.get("userEmail");
                 break;
             case "collector":
-                Map<Object, Object> collectorData = getTemporaryCollector(authDTO.getPrimaryKey(), authService);
+                Map<Object, Object> collectorData = getTemporaryCollector(authDTO.getTempKey(), authService);
                 email = (String) collectorData.get("collectorEmail");
                 break;
             default:
@@ -93,11 +95,11 @@ public class AuthUtil {
 
         switch (role) {
             case "user":
-                Map<Object, Object> userData = getTemporaryUser(authDTO.getPrimaryKey(), authService);
+                Map<Object, Object> userData = getTemporaryUser(authDTO.getTempKey(), authService);
                 phone = (String) userData.get("phone");
                 break;
             case "collector":
-                Map<Object, Object> collectorData = getTemporaryCollector(authDTO.getPrimaryKey(), authService);
+                Map<Object, Object> collectorData = getTemporaryCollector(authDTO.getTempKey(), authService);
                 phone = (String) collectorData.get("phone");
                 break;
             default:
@@ -106,49 +108,51 @@ public class AuthUtil {
         return phone;
     }
 
-    public static ResponseDTO verificationResult(AuthDTO authDTO, boolean verified, UserService userService, CollectorService collectorService, AuthService authService) {
+    public static ResponseDTO verificationResult(AuthDTO authDTO, boolean verified, UserService userService, CollectorService collectorService, AuthService authService, MemberRepository memberRepository) {
         String role = authDTO.getRole();
         Map<Object, Object> tempData;
 
         switch (role) {
             case "user":
-                tempData = getTemporaryUser(authDTO.getPrimaryKey(), authService);
+                tempData = getTemporaryUser(authDTO.getTempKey(), authService);
                 break;
             case "collector":
-                tempData = getTemporaryCollector(authDTO.getPrimaryKey(), authService);
+                tempData = getTemporaryCollector(authDTO.getTempKey(), authService);
                 break;
             default:
                 throw new InvalidRoleException("Invalid role specified.");
         }
 
         if (verified && !tempData.isEmpty()) {
+            Member member = new Member();
+            member.setEmail(authDTO.getTempKey());
+            member.setPassword((String) tempData.get("password"));
+            member.setName((String) tempData.get("name"));
+            member.setPhone((String) tempData.get("phone"));
+            member.setRole(role);
+            memberRepository.save(member);
+
             if (role.equals("user")) {
                 Users user = new Users();
-                user.setName((String) tempData.get("name"));
-                user.setEmail((String) tempData.get("userEmail"));
-                user.setPassword((String) tempData.get("password"));
-                user.setPhone((String) tempData.get("phone"));
-                user.setAddress((String) tempData.get("address"));
+                user.setMember(member);
+                user.setLocation((String) tempData.get("address"));
                 user.setAccount((String) tempData.get("account"));
                 user.setBank((String) tempData.get("bank"));
                 userService.save(user);
-                authService.deleteTemporaryUser(authDTO.getPrimaryKey());
+                authService.deleteTemporaryUser(authDTO.getTempKey());
             } else if (role.equals("collector")) {
                 Collectors collector = new Collectors();
-                collector.setName((String) tempData.get("name"));
-                collector.setEmail((String) tempData.get("collectorEmail"));
-                collector.setPassword((String) tempData.get("password"));
-                collector.setPhone((String) tempData.get("phone"));
-                collector.setAddress((String) tempData.get("address"));
+                collector.setMember(member);
+                collector.setLocation((String) tempData.get("address"));
                 collectorService.save(collector);
-                authService.deleteTemporaryCollector(authDTO.getPrimaryKey());
+                authService.deleteTemporaryCollector(authDTO.getTempKey());
             }
             return new ResponseDTO(true, "Verification Completed.", null);
         } else {
             if (role.equals("user")) {
-                authService.deleteTemporaryUser(authDTO.getPrimaryKey());
+                authService.deleteTemporaryUser(authDTO.getTempKey());
             } else {
-                authService.deleteTemporaryCollector(authDTO.getPrimaryKey());
+                authService.deleteTemporaryCollector(authDTO.getTempKey());
             }
             throw new InvalidRoleException("Verification Code does not match.");
         }

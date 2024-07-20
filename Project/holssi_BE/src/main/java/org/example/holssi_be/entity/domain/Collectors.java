@@ -1,30 +1,38 @@
 package org.example.holssi_be.entity.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.Set;
 
 @Entity
 @Data
 @Table(name = "COLLECTORS")
 public class Collectors {
 
-    @Column(name = "name", nullable = false, length = 255)
-    private String name;
-
     @Id
-    @Column(name = "collector_email", nullable = false, length = 255)
-    private String email;
+    @Column(name = "collector_id")
+    private Long id;
 
-    @Column(name = "password", nullable = false, length = 255)
-    private String password;
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "id")
+    private Member member;
 
-    @Column(name = "phone", nullable = false, length = 255)
-    private String phone;
+    @Column(name = "location", nullable = false)
+    private String location; // collection_area
 
-    @Column(name = "address", nullable = false, length = 255)
-    private String address;
+    @OneToMany(mappedBy = "collector")
+    private Set<Garbage> garbage;
+
+    @OneToMany(mappedBy = "collector")
+    private Set<Schedule> schedules;
+
+    @OneToMany(mappedBy = "collector")
+    private Set<Rating> ratings;
+
+    public String getEmail() {
+        return member.getEmail();
+    }
 
 }

@@ -27,6 +27,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(MemberNotFoundException.class)
+    public ResponseEntity<ResponseDTO> handleMemberNotFoundException(MemberNotFoundException ex) {
+        return new ResponseEntity<>(new ResponseDTO(false, null, ex.getMessage()), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(InvalidTokenFormatException.class)
+    public ResponseEntity<ResponseDTO> handleInvalidTokenFormatException(InvalidTokenFormatException ex) {
+        return new ResponseEntity<>(new ResponseDTO(false, null, ex.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ResponseDTO> handleException(Exception ex) {
         ResponseDTO response = new ResponseDTO(false, null, "Internal Server Error");

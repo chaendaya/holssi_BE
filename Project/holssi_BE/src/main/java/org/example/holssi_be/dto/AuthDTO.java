@@ -12,7 +12,7 @@ public class AuthDTO {
     private String role;
 
     @NotEmpty(message = "Primary key cannot be empty")
-    private String primaryKey;
+    private String tempKey;
 
     private String code;
 

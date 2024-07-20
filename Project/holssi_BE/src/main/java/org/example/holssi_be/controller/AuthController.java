@@ -5,6 +5,7 @@ import org.example.holssi_be.dto.AuthDTO;
 import org.example.holssi_be.dto.CollectorDTO;
 import org.example.holssi_be.dto.ResponseDTO;
 import org.example.holssi_be.dto.UserDTO;
+import org.example.holssi_be.repository.MemberRepository;
 import org.example.holssi_be.service.*;
 import org.example.holssi_be.util.AuthUtil;
 import org.example.holssi_be.util.ValidationUtil;
@@ -35,6 +36,9 @@ public class AuthController {
 
     @Autowired
     private CollectorService collectorService;
+
+    @Autowired
+    private MemberRepository memberRepository;
 
     @PostMapping("/user")
     public ResponseDTO registerUser(@RequestBody @Valid UserDTO userDTO, BindingResult bindingResult) {
@@ -85,7 +89,7 @@ public class AuthController {
         String email = AuthUtil.getEmailByRole(authDTO, authService);
         boolean verified = authService.verifyCode(email, authDTO.getCode());
 
-        return AuthUtil.verificationResult(authDTO, verified, userService, collectorService, authService);
+        return AuthUtil.verificationResult(authDTO, verified, userService, collectorService, authService, memberRepository);
     }
 
     @PostMapping("/verifyWhatsApp")
@@ -95,6 +99,6 @@ public class AuthController {
         String phone = AuthUtil.getPhoneByRole(authDTO, authService);
         boolean verified = authService.verifyCode(phone, authDTO.getCode());
 
-        return AuthUtil.verificationResult(authDTO, verified, userService, collectorService, authService);
+        return AuthUtil.verificationResult(authDTO, verified, userService, collectorService, authService, memberRepository);
     }
 }

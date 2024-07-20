@@ -3,31 +3,41 @@ package org.example.holssi_be.entity.domain;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.Set;
+
 @Entity
 @Data
 @Table(name = "USERS")
 public class Users {
 
-    @Column(name = "name", nullable = false, length = 255)
-    private String name;
-
     @Id
-    @Column(name = "user_email", nullable = false, length = 255)
-    private String email;
+    @Column(name = "user_id")
+    private Long id;
 
-    @Column(name = "password", nullable = false, length = 255)
-    private String password;
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "id")
+    private Member member;
 
-    @Column(name = "phone", nullable = false, length = 255)
-    private String phone;
+    @Column(name = "location", nullable = false)
+    private String location;
 
-    @Column(name = "address", nullable = false, length = 255)
-    private String address;
-
-    @Column(name = "account", nullable = false, length = 255)
+    @Column(name = "account", nullable = false)
     private String account;
 
-    @Column(name = "bank", nullable = false, length = 255)
+    @Column(name = "bank", nullable = false)
     private String bank;
 
+    @OneToMany(mappedBy = "user")
+    private Set<Garbage> garbage;
+
+    @OneToMany(mappedBy = "user")
+    private Set<Schedule> schedules;
+
+    @OneToMany(mappedBy = "user")
+    private Set<Rating> ratings;
+
+    public String getEmail() {
+        return member.getEmail();
+    }
 }
