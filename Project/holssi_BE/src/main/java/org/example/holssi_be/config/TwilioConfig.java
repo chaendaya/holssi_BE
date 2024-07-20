@@ -15,6 +15,9 @@ public class TwilioConfig {
     @Value("${twilio.phone.number}")
     private String fromNumber;
 
+    @Value("${twilio.template.sid}")
+    private String templateSid;
+
     public String getAccountSid() {
         return accountSid;
     }
@@ -25,5 +28,9 @@ public class TwilioConfig {
 
     public String getFromNumber() {
         return fromNumber;
+    }
+
+    public String getTemplateSid() {
+        return templateSid;
     }
 }
