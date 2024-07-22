@@ -48,7 +48,7 @@ public class LoginController {
             Member member = memberRepository.findByEmail(loginDTO.getEmail()).get();
 
             // JWT 토큰 생성
-            final String token = jwtTokenUtil.createToken(userDetails, member.getId());
+            final String token = jwtTokenUtil.createToken(userDetails);
 
             // 응답 구성
             Map<String, Object> response = new HashMap<>();

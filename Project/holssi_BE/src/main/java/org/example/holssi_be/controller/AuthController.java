@@ -1,10 +1,7 @@
 package org.example.holssi_be.controller;
 
 import jakarta.validation.Valid;
-import org.example.holssi_be.dto.AuthDTO;
-import org.example.holssi_be.dto.CollectorDTO;
-import org.example.holssi_be.dto.ResponseDTO;
-import org.example.holssi_be.dto.UserDTO;
+import org.example.holssi_be.dto.*;
 import org.example.holssi_be.repository.MemberRepository;
 import org.example.holssi_be.service.*;
 import org.example.holssi_be.util.AuthUtil;

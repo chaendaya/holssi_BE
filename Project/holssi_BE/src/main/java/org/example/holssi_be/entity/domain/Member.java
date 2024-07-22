@@ -1,5 +1,6 @@
 package org.example.holssi_be.entity.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -27,9 +28,15 @@ public class Member {
     private String role;
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
+    @JsonIgnore
     private Users user;
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
+    @JsonIgnore
     private Collectors collector;
+
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Admins admin;
 
 }

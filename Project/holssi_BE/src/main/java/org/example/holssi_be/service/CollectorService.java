@@ -25,8 +25,4 @@ public class CollectorService {
         memberRepository.save(collector.getMember());
         collectorRepository.save(collector);
     }
-
-    public Collectors findById(Long id) {
-        return collectorRepository.findById(id).orElse(null);
-    }
 }

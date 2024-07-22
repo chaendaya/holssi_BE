@@ -26,7 +26,7 @@ public class AuthUtil {
         userData.put("userEmail", userDTO.getUserEmail());
         userData.put("password", userDTO.getPassword());
         userData.put("phone", userDTO.getPhone());
-        userData.put("address", userDTO.getAddress());
+        userData.put("location", userDTO.getLocation());
         userData.put("account", userDTO.getAccount());
         userData.put("bank", userDTO.getBank());
         return userData;
@@ -38,7 +38,7 @@ public class AuthUtil {
         collectorData.put("collectorEmail", collectorDTO.getCollectorEmail());
         collectorData.put("password", collectorDTO.getPassword());
         collectorData.put("phone", collectorDTO.getPhone());
-        collectorData.put("address", collectorDTO.getAddress());
+        collectorData.put("location", collectorDTO.getLocation());
         return collectorData;
     }
 
@@ -135,7 +135,7 @@ public class AuthUtil {
             if (role.equals("user")) {
                 Users user = new Users();
                 user.setMember(member);
-                user.setLocation((String) tempData.get("address"));
+                user.setLocation((String) tempData.get("location"));
                 user.setAccount((String) tempData.get("account"));
                 user.setBank((String) tempData.get("bank"));
                 userService.save(user);
@@ -143,7 +143,7 @@ public class AuthUtil {
             } else if (role.equals("collector")) {
                 Collectors collector = new Collectors();
                 collector.setMember(member);
-                collector.setLocation((String) tempData.get("address"));
+                collector.setLocation((String) tempData.get("location"));
                 collectorService.save(collector);
                 authService.deleteTemporaryCollector(authDTO.getTempKey());
             }
