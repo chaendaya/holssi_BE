@@ -43,6 +43,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ResponseEntity<ResponseDTO> handleUnauthorizedAccessException(UnauthorizedAccessException ex) {
+        ResponseDTO response = new ResponseDTO(false, null, ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ResponseDTO> handleException(Exception ex) {
         ResponseDTO response = new ResponseDTO(false, null, "Internal Server Error");

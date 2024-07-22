@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 @Entity
 @Data
@@ -25,23 +26,26 @@ public class Garbage {
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date registrationDate;
-    private long daysSinceRegistration;
     private String location;
-
-    private boolean matched;    // 수거인 매칭 여부
-    private Date collectionDate;
-    private boolean startCollection; // 수거 시작 여부
 
     @ManyToOne
     @JoinColumn(name = "collector_id")
     private Collectors collector;
 
+    @OneToOne(mappedBy = "garbage", cascade = CascadeType.ALL)
+    private GarbageStatus status;
+
     // registrationDate 필드 자동으로 설정
     @PrePersist
     protected void onCreate() {
-
-        registrationDate = new Date(); // 등록 시 현재 시간을 설정
-        daysSinceRegistration = 0;
+        registrationDate = new Date();
     }
 
+    // daysSinceRegistration을 계산하는 메서드
+    @Transient
+    public long getDaysSinceRegistration() {
+        long diffInMillies = Math.abs(new Date().getTime() - registrationDate.getTime());
+        return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+    }
 }
+

@@ -19,17 +19,12 @@ public class Collectors {
     @JoinColumn(name = "id")
     private Member member;
 
-
     @Column(name = "location", nullable = false)
     private String location; // collection_area
 
     @OneToMany(mappedBy = "collector")
     @JsonIgnore
     private Set<Garbage> garbage;
-
-    @OneToMany(mappedBy = "collector")
-    @JsonIgnore
-    private Set<Schedule> schedules;
 
     @OneToMany(mappedBy = "collector")
     @JsonIgnore
