@@ -19,13 +19,29 @@ public class Garbage {
     private Users user;
 
     private Double organicWeight;
-    private Double inorganicWeight;
+    private Double non_organicWeight;
+    private Double totalWeight;
     private Double totalValue;
-    private String status;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date registrationDate;
+    private long daysSinceRegistration;
+    private String location;
+
+    private boolean matched;    // 수거인 매칭 여부
     private Date collectionDate;
+    private boolean startCollection; // 수거 시작 여부
 
     @ManyToOne
     @JoinColumn(name = "collector_id")
     private Collectors collector;
+
+    // registrationDate 필드 자동으로 설정
+    @PrePersist
+    protected void onCreate() {
+
+        registrationDate = new Date(); // 등록 시 현재 시간을 설정
+        daysSinceRegistration = 0;
+    }
 
 }

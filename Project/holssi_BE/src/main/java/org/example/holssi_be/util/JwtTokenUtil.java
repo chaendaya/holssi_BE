@@ -19,10 +19,9 @@ public class JwtTokenUtil {
     private Long expiration;
 
     // 토큰 생성
-    public String createToken(UserDetails userDetails, Long memberId) {
+    public String createToken(UserDetails userDetails) {
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
-                //.setId(memberId.toString())   // ID로 설정
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000))
                 .signWith(SignatureAlgorithm.HS512, secret)

@@ -28,6 +28,7 @@ public class HomeController {
 
     @GetMapping("/home")
     public ResponseEntity<ResponseDTO> getHome(@RequestHeader("Authorization") String token) {
+
         if (token == null || !token.startsWith("Bearer ")) {
             throw new InvalidTokenFormatException("Invalid token format");
         }
@@ -37,7 +38,6 @@ public class HomeController {
 
         // JWT 토큰에서 사용자 ID 추출
         String email = jwtTokenUtil.getUsernameFromToken(jwtToken);
-        //Long id = jwtTokenUtil.getUserIdFromToken(jwtToken);
 
         // 사용자 정보 로드
         Member member = memberRepository.findByEmail(email)

@@ -9,5 +9,5 @@ public class CollectorDTO {
     private String collectorEmail;
     private String password;
     private String phone;
-    private String address;
+    private String location;
 }

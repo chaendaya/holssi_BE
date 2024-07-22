@@ -23,7 +23,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private JwtTokenUtil jwtTokenUtil;
 
     private CustomUserDetailsService customUserDetailsService;
-    private static final List<String> EXCLUDED_PATHS = List.of("/api/auth/**", "/api/login", "/h2-console/**");
+    private static final List<String> EXCLUDED_PATHS = List.of("/api/auth/**", "/api/login", "/api/admin/create", "/h2-console/**", "/api/temp/**");
 
     @Autowired
     public JwtRequestFilter(JwtTokenUtil jwtTokenUtil, CustomUserDetailsService customUserDetailsService) {

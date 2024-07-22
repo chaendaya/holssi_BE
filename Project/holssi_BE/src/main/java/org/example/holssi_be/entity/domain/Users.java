@@ -1,5 +1,6 @@
 package org.example.holssi_be.entity.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -7,7 +8,6 @@ import java.util.Set;
 
 @Entity
 @Data
-@Table(name = "USERS")
 public class Users {
 
     @Id
@@ -29,12 +29,15 @@ public class Users {
     private String bank;
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private Set<Garbage> garbage;
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private Set<Schedule> schedules;
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private Set<Rating> ratings;
 
     public String getEmail() {
