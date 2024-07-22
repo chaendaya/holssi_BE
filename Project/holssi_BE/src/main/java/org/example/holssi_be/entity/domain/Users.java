@@ -32,14 +32,6 @@ public class Users {
     @JsonIgnore
     private Set<Garbage> garbage;
 
-    @OneToMany(mappedBy = "user")
-    @JsonIgnore
-    private Set<Schedule> schedules;
-
-    @OneToMany(mappedBy = "user")
-    @JsonIgnore
-    private Set<Rating> ratings;
-
     public String getEmail() {
         return member.getEmail();
     }

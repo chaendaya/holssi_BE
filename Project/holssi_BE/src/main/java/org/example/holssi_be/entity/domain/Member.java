@@ -25,7 +25,7 @@ public class Member {
     private String phone;
 
     @Column(name = "role",nullable = false)
-    private String role;
+    private String role;    // "USER", "COLLECTOR", "ADMIN"
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
     @JsonIgnore
