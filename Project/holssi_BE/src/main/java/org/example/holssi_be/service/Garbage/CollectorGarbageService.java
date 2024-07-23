@@ -14,6 +14,8 @@ import org.example.holssi_be.repository.GarbageRepository;
 import org.example.holssi_be.util.GeocodingUtil;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -122,4 +124,29 @@ public class CollectorGarbageService {
 
 
     // 개별 쓰레기 수거 완료
+    public void completeCollection(Long garbageId, Member collector) {
+        Garbage garbage = garbageRepository.findById(garbageId)
+                .orElseThrow(() -> new ResourceNotFoundException("Garbage not found with ID: " + garbageId));
+
+        if (!collector.getRole().equals("collector")) {
+            throw new UnauthorizedAccessException("Member is not a collector.");
+        }
+
+        Collectors collectorEntity = collector.getCollector();
+        garbage.setCollector(collectorEntity);
+
+        GarbageStatus status = garbage.getStatus();
+
+        if (status.isMatched() && status.isStartCollection()) {
+
+            Date currentDate = Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
+            status.setCollectionDate(currentDate); // 현재 시간을 CollectionDate 로 설정
+            status.setStartCollection(false);
+            status.setCollectionCompleted(true);
+            garbageRepository.save(garbage);
+        }
+    }
+
+
 }
+
