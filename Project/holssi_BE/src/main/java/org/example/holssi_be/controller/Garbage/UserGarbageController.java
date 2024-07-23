@@ -2,13 +2,13 @@ package org.example.holssi_be.controller.Garbage;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.example.holssi_be.dto.Garbage.RegisterGarbageDTO;
 import org.example.holssi_be.dto.Garbage.RegisteredGarbageDTO;
 import org.example.holssi_be.dto.ResponseDTO;
 import org.example.holssi_be.entity.domain.Member;
 import org.example.holssi_be.service.Garbage.UserGarbageService;
 import org.example.holssi_be.util.ValidationUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,14 +16,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/garbages")
+@RequiredArgsConstructor
 public class UserGarbageController {
 
     private final UserGarbageService userGarbageService;
-
-    @Autowired
-    public UserGarbageController(UserGarbageService userGarbageService) {
-        this.userGarbageService = userGarbageService;
-    }
 
     @PostMapping("/totalWeight")
     public ResponseDTO totalWeight(@RequestBody @Valid RegisterGarbageDTO registerGarbageDTO, BindingResult bindingResult) {

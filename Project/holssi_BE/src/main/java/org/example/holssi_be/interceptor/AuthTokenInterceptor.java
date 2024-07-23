@@ -1,28 +1,26 @@
 package org.example.holssi_be.interceptor;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.example.holssi_be.entity.domain.Member;
 import org.example.holssi_be.exception.InvalidTokenFormatException;
 import org.example.holssi_be.repository.MemberRepository;
 import org.example.holssi_be.util.JwtTokenUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 @Component
+@RequiredArgsConstructor
 public class AuthTokenInterceptor implements HandlerInterceptor {
 
-    @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+    private final JwtTokenUtil jwtTokenUtil;
 
-    @Autowired
-    private MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String token = request.getHeader("Authorization");
 
         if (token == null || !token.startsWith("Bearer ")) {

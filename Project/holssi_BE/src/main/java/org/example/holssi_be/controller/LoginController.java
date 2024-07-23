@@ -1,12 +1,12 @@
 package org.example.holssi_be.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.example.holssi_be.dto.LoginDTO;
 import org.example.holssi_be.dto.ResponseDTO;
 import org.example.holssi_be.entity.domain.Member;
 import org.example.holssi_be.repository.MemberRepository;
 import org.example.holssi_be.service.CustomUserDetailsService;
 import org.example.holssi_be.util.JwtTokenUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,19 +21,16 @@ import java.util.Map;
 
 @RestController
 @RequestMapping ("/api")
+@RequiredArgsConstructor
 public class LoginController {
 
-    @Autowired
-    private AuthenticationManager  authenticationManager;
+    private final AuthenticationManager  authenticationManager;
 
-    @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+    private final JwtTokenUtil jwtTokenUtil;
 
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
+    private final CustomUserDetailsService userDetailsService;
 
-    @Autowired
-    private MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
 
     @PostMapping("/login")
     public ResponseEntity<ResponseDTO> createAuthToken(@RequestBody LoginDTO loginDTO) {

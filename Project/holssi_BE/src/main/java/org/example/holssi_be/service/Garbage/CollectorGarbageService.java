@@ -1,5 +1,6 @@
 package org.example.holssi_be.service.Garbage;
 
+import lombok.RequiredArgsConstructor;
 import org.example.holssi_be.dto.Garbage.AcceptGarbageDTO;
 import org.example.holssi_be.dto.Garbage.GarbageDetailsDTO;
 import org.example.holssi_be.dto.Garbage.GarbageInfoDTO;
@@ -11,7 +12,6 @@ import org.example.holssi_be.exception.ResourceNotFoundException;
 import org.example.holssi_be.exception.UnauthorizedAccessException;
 import org.example.holssi_be.repository.GarbageRepository;
 import org.example.holssi_be.util.GeocodingUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -19,13 +19,12 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
+@RequiredArgsConstructor
 public class CollectorGarbageService {
 
-    @Autowired
-    private GarbageRepository garbageRepository;
+    private final GarbageRepository garbageRepository;
 
-    @Autowired
-    private GeocodingUtil geocodingUtil;
+    private final GeocodingUtil geocodingUtil;
 
     // 매칭 대기 중인 쓰레기 리스트 조회 - Collector
     public List<GarbageInfoDTO> getWaitingGarbages(String collectorLocation) {

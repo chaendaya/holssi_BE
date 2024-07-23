@@ -1,12 +1,12 @@
 package org.example.holssi_be.service.Garbage;
 
+import lombok.RequiredArgsConstructor;
 import org.example.holssi_be.dto.Garbage.RegisterGarbageDTO;
 import org.example.holssi_be.dto.Garbage.RegisteredGarbageDTO;
 import org.example.holssi_be.entity.domain.Garbage;
 import org.example.holssi_be.entity.domain.GarbageStatus;
 import org.example.holssi_be.entity.domain.Member;
 import org.example.holssi_be.repository.GarbageRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
@@ -14,10 +14,10 @@ import java.util.Date;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserGarbageService {
 
-    @Autowired
-    private GarbageRepository garbageRepository;
+    private final GarbageRepository garbageRepository;
 
     // 쓰레기 등록 - User
     public void registerGarbage(RegisterGarbageDTO registerGarbageDTO, Member member) {
@@ -58,7 +58,6 @@ public class UserGarbageService {
         RegisteredGarbageDTO dto = new RegisteredGarbageDTO();
         dto.setGarbageId(garbage.getId());
         dto.setMatched(garbage.getStatus().isMatched());
-        dto.setStartCollection(garbage.getStatus().isStartCollection());
         dto.setCollectorName(garbage.getCollector().getMember().getName());
         dto.setCollectionDayOfWeek(getDayOfWeek(garbage.getStatus().getCollectionDate()));
         dto.setCollectionStatus(determineCollectionStatus(garbage));

@@ -33,11 +33,6 @@ public class JwtTokenUtil {
         return getClaimsFromToken(token).getSubject();
     }
 
-    // 토큰에서 사용자 ID 추출
-    public Long getUserIdFromToken(String token) {
-        return Long.valueOf(getClaimsFromToken(token).getId());
-    }
-
     // 토큰 유효성 검증
     public boolean validateToken(String token, UserDetails userDetails) {
         final String username = getUsernameFromToken(token); // 토큰에서 이메일 추출
