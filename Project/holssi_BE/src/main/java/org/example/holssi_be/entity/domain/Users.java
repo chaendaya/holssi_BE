@@ -28,6 +28,9 @@ public class Users {
     @Column(name = "bank", nullable = false)
     private String bank;
 
+    @Column(name = "value")
+    private double value;
+
     @OneToMany(mappedBy = "user")
     @JsonIgnore
     private Set<Garbage> garbage;
