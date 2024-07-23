@@ -6,7 +6,11 @@ import org.example.holssi_be.dto.Garbage.RegisteredGarbageDTO;
 import org.example.holssi_be.entity.domain.Garbage;
 import org.example.holssi_be.entity.domain.GarbageStatus;
 import org.example.holssi_be.entity.domain.Member;
+import org.example.holssi_be.entity.domain.Users;
+import org.example.holssi_be.exception.ResourceNotFoundException;
+import org.example.holssi_be.exception.UnauthorizedAccessException;
 import org.example.holssi_be.repository.GarbageRepository;
+import org.example.holssi_be.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
@@ -18,6 +22,7 @@ import java.util.List;
 public class UserGarbageService {
 
     private final GarbageRepository garbageRepository;
+    private final UserRepository userRepository;
 
     // 쓰레기 등록 - User
     public void registerGarbage(RegisterGarbageDTO registerGarbageDTO, Member member) {
@@ -71,14 +76,22 @@ public class UserGarbageService {
         calendar.setTime(date);
         int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
         switch (dayOfWeek) {
-            case Calendar.SUNDAY: return "일요일";
-            case Calendar.MONDAY: return "월요일";
-            case Calendar.TUESDAY: return "화요일";
-            case Calendar.WEDNESDAY: return "수요일";
-            case Calendar.THURSDAY: return "목요일";
-            case Calendar.FRIDAY: return "금요일";
-            case Calendar.SATURDAY: return "토요일";
-            default: return "";
+            case Calendar.SUNDAY:
+                return "일요일";
+            case Calendar.MONDAY:
+                return "월요일";
+            case Calendar.TUESDAY:
+                return "화요일";
+            case Calendar.WEDNESDAY:
+                return "수요일";
+            case Calendar.THURSDAY:
+                return "목요일";
+            case Calendar.FRIDAY:
+                return "금요일";
+            case Calendar.SATURDAY:
+                return "토요일";
+            default:
+                return "";
         }
     }
 
@@ -97,5 +110,17 @@ public class UserGarbageService {
             }
         }
         return "매칭 안됨";
+    }
+
+    // 저축된 총 RP값 조회
+    public double getTotalRp(Long userId, Member user) {
+        Users users = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+        if (!user.getRole().equals("user")) {
+            throw new UnauthorizedAccessException("Member is not a user.");
+        }
+
+        return users.getTotalRp();
     }
 }
