@@ -56,4 +56,12 @@ public class CollectorGarbageController {
         GarbageDetailsDTO garbageDetails = collectorGarbageService.getGarbageDetails(garbageId);
         return new ResponseDTO(true, garbageDetails, null);
     }
+
+    // 개별 쓰레기 수거 시작 - Collector
+    @PostMapping("/accept/{garbage-id}/start")
+    public ResponseDTO startCollection(@PathVariable("garbage-id") Long garbageId, HttpServletRequest request) {
+        Member member = (Member) request.getAttribute("member");
+        collectorGarbageService.startCollection(garbageId, member);
+        return new ResponseDTO(true, "Collection started", null);
+    }
 }

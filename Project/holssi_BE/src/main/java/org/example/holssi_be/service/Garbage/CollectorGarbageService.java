@@ -101,4 +101,25 @@ public class CollectorGarbageService {
         dto.setTotalValue(garbage.getTotalValue());
         return dto;
     }
+
+    // 개별 쓰레기 수거 시작
+    public void startCollection(Long garbageId, Member collector) {
+        Garbage garbage = garbageRepository.findById(garbageId)
+                .orElseThrow(() -> new ResourceNotFoundException("Garbage not found with ID: " + garbageId));
+
+        if (!collector.getRole().equals("collector")) {
+            throw new UnauthorizedAccessException("Member is not a collector.");
+        }
+
+        Collectors collectorEntity = collector.getCollector();
+        garbage.setCollector(collectorEntity);
+        GarbageStatus status = garbage.getStatus();
+        status.setStartCollection(true);
+
+        garbageRepository.save(garbage);
+    }
+
+
+
+    // 개별 쓰레기 수거 완료
 }
