@@ -15,7 +15,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authTokenInterceptor)
-                .addPathPatterns("/api/garbages/**") // 인증이 필요한 경로
+                .addPathPatterns("/api/garbages/**", "/api/user/**") // 인증이 필요한 경로
                 .excludePathPatterns("/api/auth/**", "/api/login", "/api/admin/create",
                         "/h2-console/**", "/api/temp/**", "/api/garbages/totalWeight"); // 인증이 필요 없는 경로
     }
