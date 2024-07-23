@@ -1,16 +1,17 @@
 package org.example.holssi_be.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.example.holssi_be.service.AuthService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
 @RestController
 @RequestMapping("/member")
+@RequiredArgsConstructor
 public class RedisController {
-    @Autowired
-    private AuthService authService;
+
+    private final AuthService authService;
 
     @GetMapping
     public Map<Object, Object> getUserData(@RequestParam String email) {

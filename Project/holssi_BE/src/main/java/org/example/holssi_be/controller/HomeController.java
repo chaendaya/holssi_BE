@@ -1,11 +1,11 @@
 package org.example.holssi_be.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.example.holssi_be.dto.ResponseDTO;
 import org.example.holssi_be.entity.domain.Member;
 import org.example.holssi_be.exception.InvalidTokenFormatException;
 import org.example.holssi_be.repository.MemberRepository;
 import org.example.holssi_be.util.JwtTokenUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,13 +18,12 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class HomeController {
 
-    @Autowired
-    private MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
 
-    @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+    private final JwtTokenUtil jwtTokenUtil;
 
     @GetMapping("/home")
     public ResponseEntity<ResponseDTO> getHome(@RequestHeader("Authorization") String token) {

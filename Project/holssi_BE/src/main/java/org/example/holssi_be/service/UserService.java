@@ -1,23 +1,21 @@
 package org.example.holssi_be.service;
 
+import lombok.RequiredArgsConstructor;
 import org.example.holssi_be.entity.domain.Users;
 import org.example.holssi_be.repository.MemberRepository;
 import org.example.holssi_be.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     public void save(Users user) {
         // 비밀번호 인코딩

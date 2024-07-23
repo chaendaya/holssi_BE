@@ -6,7 +6,6 @@ import lombok.Data;
 public class RegisteredGarbageDTO {
     private Long garbageId;
     private boolean matched;
-    private boolean startCollection;
     private String collectorName;
     private String collectionDayOfWeek;
     private String collectionStatus;

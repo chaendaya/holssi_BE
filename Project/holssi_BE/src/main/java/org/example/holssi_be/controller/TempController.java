@@ -1,12 +1,12 @@
 package org.example.holssi_be.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.example.holssi_be.dto.CollectorDTO;
 import org.example.holssi_be.dto.ResponseDTO;
 import org.example.holssi_be.dto.UserDTO;
 import org.example.holssi_be.service.TempService;
 import org.example.holssi_be.util.ValidationUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,11 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/temp")
+@RequiredArgsConstructor
 public class TempController {
 
     // 테스트를 위해 인증없이 User와 Collector를 추가하는 임시 API 입니다.
-    @Autowired
-    private TempService tempService;
+
+    private final TempService tempService;
 
     @PostMapping("/user")
     public ResponseDTO createUser(@RequestBody @Valid UserDTO userDTO, BindingResult bindingResult) {

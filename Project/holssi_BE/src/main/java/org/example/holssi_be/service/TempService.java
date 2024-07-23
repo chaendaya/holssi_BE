@@ -1,31 +1,28 @@
 package org.example.holssi_be.service;
 
+import lombok.RequiredArgsConstructor;
 import org.example.holssi_be.dto.CollectorDTO;
 import org.example.holssi_be.dto.UserDTO;
+import org.example.holssi_be.entity.domain.Collectors;
 import org.example.holssi_be.entity.domain.Member;
 import org.example.holssi_be.entity.domain.Users;
-import org.example.holssi_be.entity.domain.Collectors;
 import org.example.holssi_be.repository.CollectorRepository;
 import org.example.holssi_be.repository.MemberRepository;
 import org.example.holssi_be.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class TempService {
 
-    @Autowired
-    private MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private CollectorRepository collectorRepository;
+    private final CollectorRepository collectorRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     public void createUser(UserDTO userDTO) {
         Member member = new Member();

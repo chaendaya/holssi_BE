@@ -1,5 +1,6 @@
 package org.example.holssi_be.config;
 
+import lombok.RequiredArgsConstructor;
 import org.example.holssi_be.service.CustomUserDetailsService;
 import org.example.holssi_be.util.JwtRequestFilter;
 import org.springframework.context.annotation.Bean;
@@ -16,15 +17,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtRequestFilter jwtRequestFilter;
     private final CustomUserDetailsService customUserDetailsService;
-
-    public SecurityConfig(JwtRequestFilter jwtRequestFilter, CustomUserDetailsService customUserDetailsService) {
-        this.jwtRequestFilter = jwtRequestFilter;
-        this.customUserDetailsService = customUserDetailsService;
-    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

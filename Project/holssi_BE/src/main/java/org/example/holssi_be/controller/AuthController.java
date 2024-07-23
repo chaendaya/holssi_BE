@@ -1,12 +1,15 @@
 package org.example.holssi_be.controller;
 
 import jakarta.validation.Valid;
-import org.example.holssi_be.dto.*;
+import lombok.RequiredArgsConstructor;
+import org.example.holssi_be.dto.AuthDTO;
+import org.example.holssi_be.dto.CollectorDTO;
+import org.example.holssi_be.dto.ResponseDTO;
+import org.example.holssi_be.dto.UserDTO;
 import org.example.holssi_be.repository.MemberRepository;
 import org.example.holssi_be.service.*;
 import org.example.holssi_be.util.AuthUtil;
 import org.example.holssi_be.util.ValidationUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,25 +20,20 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
 
-    @Autowired
-    private EmailService emailService;
+    private final EmailService emailService;
 
-    @Autowired
-    private WhatsAppService whatsAppService;
+    private final WhatsAppService whatsAppService;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private CollectorService collectorService;
+    private final CollectorService collectorService;
 
-    @Autowired
-    private MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
 
     @PostMapping("/user")
     public ResponseDTO registerUser(@RequestBody @Valid UserDTO userDTO, BindingResult bindingResult) {
@@ -52,6 +50,11 @@ public class AuthController {
 
         Map<String, String> collectorData = AuthUtil.createTemporaryCollector(collectorDTO);
         authService.saveTemporaryCollector(collectorDTO.getCollectorEmail(), collectorData);
+        return new ResponseDTO(true, null, null);
+    }
+
+    @PostMapping("/checkEmail")
+    public ResponseDTO checkEmail( /* DTO 인자로 받기 */) {
         return new ResponseDTO(true, null, null);
     }
 

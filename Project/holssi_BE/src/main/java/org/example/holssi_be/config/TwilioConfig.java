@@ -1,9 +1,11 @@
 package org.example.holssi_be.config;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@Getter
 public class TwilioConfig {
 
     @Value("${twilio.account.sid}")
@@ -18,19 +20,4 @@ public class TwilioConfig {
     @Value("${twilio.template.sid}")
     private String templateSid;
 
-    public String getAccountSid() {
-        return accountSid;
-    }
-
-    public String getAuthToken() {
-        return authToken;
-    }
-
-    public String getFromNumber() {
-        return fromNumber;
-    }
-
-    public String getTemplateSid() {
-        return templateSid;
-    }
 }

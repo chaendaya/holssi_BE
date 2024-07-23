@@ -1,8 +1,8 @@
 package org.example.holssi_be.util;
 
+import lombok.RequiredArgsConstructor;
 import org.example.holssi_be.entity.domain.Garbage;
 import org.example.holssi_be.repository.GarbageRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Component
+@RequiredArgsConstructor
 public class GarbageCleanupScheduler {
 
-    @Autowired
-    private GarbageRepository garbageRepository;
+    private final GarbageRepository garbageRepository;
 
     // 스케줄러를 사용하여 수거 완료 후 3일이 지난 쓰레기를 자동으로 삭제
     @Scheduled(cron = "0 0 0 * * ?") // 매일 자정에 실행
