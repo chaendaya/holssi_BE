@@ -21,12 +21,14 @@ public class UserGarbageController {
 
     private final UserGarbageService userGarbageService;
 
-    @PostMapping("/totalWeight")
+    @PostMapping("/totalValue")
     public ResponseDTO totalWeight(@RequestBody @Valid RegisterGarbageDTO registerGarbageDTO, BindingResult bindingResult) {
         ValidationUtil.validateRequest(bindingResult);
-        double totalWeight = registerGarbageDTO.getOrganicWeight() + registerGarbageDTO.getNon_organicWeight();
+        double organicWeight = registerGarbageDTO.getOrganicWeight();
+        double non_organicWeight = registerGarbageDTO.getNon_organicWeight();
+        double totalValue = 60 * organicWeight + 80 * non_organicWeight;
 
-        return new ResponseDTO(true, totalWeight, null);
+        return new ResponseDTO(true, totalValue, null);
     }
 
     // 쓰레기 등록 - User
