@@ -28,8 +28,7 @@ public class Users {
     @Column(name = "bank", nullable = false)
     private String bank;
 
-    @Column(name = "value")
-    private double value;
+    private double totalRp;
 
     @OneToMany(mappedBy = "user")
     @JsonIgnore
