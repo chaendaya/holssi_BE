@@ -24,6 +24,7 @@ public class UserGarbageController {
     @PostMapping("/totalValue")
     public ResponseDTO totalWeight(@RequestBody @Valid RegisterGarbageDTO registerGarbageDTO, BindingResult bindingResult) {
         ValidationUtil.validateRequest(bindingResult);
+
         double organicWeight = registerGarbageDTO.getOrganicWeight();
         double non_organicWeight = registerGarbageDTO.getNon_organicWeight();
         double totalValue = 60 * organicWeight + 80 * non_organicWeight;
@@ -36,6 +37,7 @@ public class UserGarbageController {
     public ResponseDTO registerGarbage(@RequestBody @Valid RegisterGarbageDTO registerGarbageDTO, BindingResult bindingResult,
                                        HttpServletRequest request) {
         ValidationUtil.validateRequest(bindingResult);
+
         Member member = (Member) request.getAttribute("member");
         userGarbageService.registerGarbage(registerGarbageDTO, member);
 
@@ -45,11 +47,10 @@ public class UserGarbageController {
     // 등록한 쓰레기 중 수거인 매칭된 쓰레기 리스트 조회 - User
     @GetMapping("/registered")
     public ResponseDTO getRegisteredGarbages(HttpServletRequest request) {
+
         Member member = (Member) request.getAttribute("member");
-        Long userId = member.getId();
-        List<RegisteredGarbageDTO> registeredGarbages = userGarbageService.getRegisteredGarbages(userId);
+        List<RegisteredGarbageDTO> registeredGarbages = userGarbageService.getRegisteredGarbages(member);
+
         return new ResponseDTO(true, registeredGarbages, null);
     }
-
-    // 개별 쓰레기 수거인 정보
 }

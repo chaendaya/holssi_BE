@@ -1,5 +1,6 @@
 package org.example.holssi_be.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.holssi_be.dto.LoginDTO;
 import org.example.holssi_be.dto.ResponseDTO;
@@ -25,15 +26,12 @@ import java.util.Map;
 public class LoginController {
 
     private final AuthenticationManager  authenticationManager;
-
     private final JwtTokenUtil jwtTokenUtil;
-
     private final CustomUserDetailsService userDetailsService;
-
     private final MemberRepository memberRepository;
 
     @PostMapping("/login")
-    public ResponseEntity<ResponseDTO> createAuthToken(@RequestBody LoginDTO loginDTO) {
+    public ResponseEntity<ResponseDTO> createAuthToken(@RequestBody @Valid LoginDTO loginDTO) {
         try{
             // Member 인증
             authenticate(loginDTO.getEmail(), loginDTO.getPassword());

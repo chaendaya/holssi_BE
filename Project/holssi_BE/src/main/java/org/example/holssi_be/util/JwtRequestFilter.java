@@ -1,11 +1,15 @@
 package org.example.holssi_be.util;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.example.holssi_be.exception.InvalidTokenException;
 import org.example.holssi_be.service.CustomUserDetailsService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,11 +25,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-    private final JwtTokenUtil jwtTokenUtil;
+    // JwtRequestFilter:
+    // JWT 토큰을 검증하고 사용자 인증을 설정한다.
+    // 인증 실패 시 적절한 에러 응답을 반환한다.
 
+    private final JwtTokenUtil jwtTokenUtil;
     private final CustomUserDetailsService customUserDetailsService;
     private static final List<String> EXCLUDED_PATHS = List.of("/api/auth/**", "/api/login", "/api/admin/create", "/h2-console/**", "/api/temp/**");
-
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -35,41 +41,57 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         // JWT 필터를 적용하지 않을 경로 확인
         if (EXCLUDED_PATHS.stream().anyMatch(requestURI::startsWith)) {
+            // 필터를 적용하지 않고 요청을 다음 필터로 전달
             chain.doFilter(request, response);
             return;
         }
 
         final String requestTokenHeader = request.getHeader("Authorization");
 
-        String username = null;   // email
-        String jwtToken = null;
-        //Long id = null;
-
-        // JWT 토큰에서 사용자 이름(이메일) 추출
+        // 요청 헤더에서 JWT 토큰 추출
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-            jwtToken = requestTokenHeader.substring(7);
+            String jwtToken = requestTokenHeader.substring(7);
             try {
-                username = jwtTokenUtil.getUsernameFromToken(jwtToken);
-                //id = jwtTokenUtil.getUserIdFromToken(jwtToken);
+                // JWT 토큰에서 사용자 이름(이메일) 추출
+                String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+
+                // 사용자 이름이 존재하고 현재 인증되지 않은 상태라면
+                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    // 사용자 세부 정보 로드
+                    UserDetails userDetails = this.customUserDetailsService.loadUserByUsername(username);
+
+                    // JWT 토큰 유효성 검증
+                    if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
+                        // 인증 토큰 생성 및 세부 정보 설정
+                        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                                userDetails, null, userDetails.getAuthorities());
+                        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                        // SecurityContext 에 인증 설정
+                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    }
+                }
             } catch (IllegalArgumentException e) {
-                System.out.println("Unable to get JWT Token");
+                // JWT 토큰 검증 실패 시 InvalidTokenException 발생
+                throw new InvalidTokenException("Unable to get JWT Token", e);
             } catch (ExpiredJwtException e) {
-                System.out.println("JWT Token has expired");
+                // JWT 토큰 만료 시 InvalidTokenException 발생
+                throw new InvalidTokenException("JWT Token has expired", e);
+            } catch (MalformedJwtException e) {
+                // JWT 토큰 형식 오류 시 InvalidTokenException 발생
+                throw new InvalidTokenException("JWT Token is malformed", e);
+            } catch (UnsupportedJwtException e) {
+                // JWT 토큰 지원되지 않음 시 InvalidTokenException 발생
+                throw new InvalidTokenException("JWT Token is unsupported", e);
+            } catch (SignatureException e) {
+                // JWT 서명 유효하지 않음 시 InvalidTokenException 발생
+                throw new InvalidTokenException("JWT signature is invalid", e);
             }
         } else {
-            logger.warn("JWT Token does not begin with Bearer String");
+            // Bearer 문자열이 없는 JWT 토큰 형식 오류 시 InvalidTokenException 발생
+            throw new InvalidTokenException("JWT Token does not begin with Bearer String");
         }
-
-        // 사용자 정보 로드 및 인증 설정
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.customUserDetailsService.loadUserByUsername(username);
-            if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-            }
-        }
+        // 다음 필터로 요청 전달
         chain.doFilter(request, response);
     }
 }

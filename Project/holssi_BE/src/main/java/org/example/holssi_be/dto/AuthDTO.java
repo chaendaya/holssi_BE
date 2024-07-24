@@ -1,6 +1,6 @@
 package org.example.holssi_be.dto;
 
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,14 +8,11 @@ import lombok.Setter;
 @Setter
 public class AuthDTO {
 
-    @NotEmpty(message = "Role cannot be empty")
+    @NotBlank(message = "role is required")
     private String role;
 
-    @NotEmpty(message = "Primary key cannot be empty")
+    @NotBlank(message = "tempKey is required")
     private String tempKey;
 
     private String code;
-
-    // 기본 생성자
-    public AuthDTO() {}
 }

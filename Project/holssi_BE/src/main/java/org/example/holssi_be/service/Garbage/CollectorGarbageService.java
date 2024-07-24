@@ -5,8 +5,8 @@ import org.example.holssi_be.dto.Garbage.AcceptGarbageDTO;
 import org.example.holssi_be.dto.Garbage.GarbageDetailsDTO;
 import org.example.holssi_be.dto.Garbage.GarbageInfoDTO;
 import org.example.holssi_be.entity.domain.*;
+import org.example.holssi_be.exception.NotCollectorException;
 import org.example.holssi_be.exception.ResourceNotFoundException;
-import org.example.holssi_be.exception.UnauthorizedAccessException;
 import org.example.holssi_be.repository.GarbageRepository;
 import org.example.holssi_be.util.GeocodingUtil;
 import org.springframework.stereotype.Service;
@@ -22,12 +22,17 @@ import java.util.concurrent.TimeUnit;
 public class CollectorGarbageService {
 
     private final GarbageRepository garbageRepository;
-
     private final GeocodingUtil geocodingUtil;
 
     // 매칭 대기 중인 쓰레기 리스트 조회 - Collector
-    public List<GarbageInfoDTO> getWaitingGarbages(String collectorLocation) {
-        return garbageRepository.findByStatus_MatchedAndLocationContaining(false, collectorLocation)
+    public List<GarbageInfoDTO> getWaitingGarbages(Member collector) {
+        if (collector == null || !collector.getRole().equals("collector")) {
+            throw new NotCollectorException("Member is not a collector");
+        }
+
+        String location = collector.getCollector().getLocation();
+
+        return garbageRepository.findByStatus_MatchedAndLocationContaining(false, location)
                 .stream()
                 .map(this::convertToGarbageInfoDTO)
                 .collect(java.util.stream.Collectors.toList());
@@ -38,8 +43,8 @@ public class CollectorGarbageService {
         Garbage garbage = garbageRepository.findById(garbageId)
                 .orElseThrow(() -> new ResourceNotFoundException("Garbage not found with ID: " + garbageId));
 
-        if (!collector.getRole().equals("collector")) {
-            throw new UnauthorizedAccessException("Member is not a collector.");
+        if (collector == null || !collector.getRole().equals("collector")) {
+            throw new NotCollectorException("Member is not a collector");
         }
 
         Collectors collectorEntity = collector.getCollector();
@@ -54,11 +59,12 @@ public class CollectorGarbageService {
 
     // 수거인 자신이 수락한 쓰레기 리스트 조회 - Collector
     public List<GarbageInfoDTO> getAcceptedGarbages(Member collector) {
-        if (!collector.getRole().equals("collector")) {
-            throw new UnauthorizedAccessException("Member is not a collector.");
+        if (collector == null || !collector.getRole().equals("collector")) {
+            throw new NotCollectorException("Member is not a collector");
         }
 
         Collectors collectorEntity = collector.getCollector();
+
         return garbageRepository.findByCollectorAndStatus_Matched(collectorEntity, true)
                 .stream()
                 .filter(garbage -> !garbage.getStatus().isStartCollection() && !garbage.getStatus().isCollectionCompleted())
@@ -67,9 +73,14 @@ public class CollectorGarbageService {
     }
 
     // 개별 쓰레기 정보 조회
-    public GarbageDetailsDTO getGarbageDetails(Long garbageId) {
+    public GarbageDetailsDTO getGarbageDetails(Long garbageId, Member collector) {
         Garbage garbage = garbageRepository.findById(garbageId)
                 .orElseThrow(() -> new ResourceNotFoundException("Garbage not found with ID: " + garbageId));
+
+        if (collector == null || !collector.getRole().equals("collector")) {
+            throw new NotCollectorException("Member is not a collector");
+        }
+
         return convertToGarbageDetailsDTO(garbage);
     }
 
@@ -106,8 +117,8 @@ public class CollectorGarbageService {
         Garbage garbage = garbageRepository.findById(garbageId)
                 .orElseThrow(() -> new ResourceNotFoundException("Garbage not found with ID: " + garbageId));
 
-        if (!collector.getRole().equals("collector")) {
-            throw new UnauthorizedAccessException("Member is not a collector.");
+        if (collector == null || !collector.getRole().equals("collector")) {
+            throw new NotCollectorException("Member is not a collector");
         }
 
         Collectors collectorEntity = collector.getCollector();
@@ -125,8 +136,8 @@ public class CollectorGarbageService {
         Garbage garbage = garbageRepository.findById(garbageId)
                 .orElseThrow(() -> new ResourceNotFoundException("Garbage not found with ID: " + garbageId));
 
-        if (!collector.getRole().equals("collector")) {
-            throw new UnauthorizedAccessException("Member is not a collector.");
+        if (collector == null || !collector.getRole().equals("collector")) {
+            throw new NotCollectorException("Member is not a collector");
         }
 
         GarbageStatus status = garbage.getStatus();
@@ -150,4 +161,3 @@ public class CollectorGarbageService {
         }
     }
 }
-
