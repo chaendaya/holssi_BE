@@ -24,15 +24,10 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
-
     private final EmailService emailService;
-
     private final WhatsAppService whatsAppService;
-
     private final UserService userService;
-
     private final CollectorService collectorService;
-
     private final MemberRepository memberRepository;
 
     @PostMapping("/user")
@@ -41,6 +36,7 @@ public class AuthController {
 
         Map<String, String> userData = AuthUtil.createTemporaryUser(userDTO);
         authService.saveTemporaryUser(userDTO.getUserEmail(), userData);
+
         return new ResponseDTO(true, null, null);
     }
 
@@ -50,6 +46,7 @@ public class AuthController {
 
         Map<String, String> collectorData = AuthUtil.createTemporaryCollector(collectorDTO);
         authService.saveTemporaryCollector(collectorDTO.getCollectorEmail(), collectorData);
+
         return new ResponseDTO(true, null, null);
     }
 
@@ -67,6 +64,7 @@ public class AuthController {
 
         emailService.sendEmail(email, code);
         authService.saveCode(email, code);
+
         return new ResponseDTO(true, "Verification code sent via email.", null);
     }
 
@@ -79,6 +77,7 @@ public class AuthController {
 
         whatsAppService.sendWhatsApp(phone, code);
         authService.saveCode(phone, code);
+
         return new ResponseDTO(true, "Verification code sent via WhatsApp.", null);
     }
 

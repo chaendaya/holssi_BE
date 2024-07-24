@@ -7,8 +7,8 @@ import org.example.holssi_be.entity.domain.Garbage;
 import org.example.holssi_be.entity.domain.GarbageStatus;
 import org.example.holssi_be.entity.domain.Member;
 import org.example.holssi_be.entity.domain.Users;
+import org.example.holssi_be.exception.NotUserException;
 import org.example.holssi_be.exception.ResourceNotFoundException;
-import org.example.holssi_be.exception.UnauthorizedAccessException;
 import org.example.holssi_be.repository.GarbageRepository;
 import org.example.holssi_be.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -26,12 +26,20 @@ public class UserGarbageService {
 
     // 쓰레기 등록 - User
     public void registerGarbage(RegisterGarbageDTO registerGarbageDTO, Member member) {
+        if (member == null || !member.getRole().equals("user")) {
+            throw new NotUserException("Member is not a user");
+        }
+
         Garbage garbage = create(registerGarbageDTO, member);
         garbageRepository.save(garbage);
     }
 
     // 쓰레기 등록 DTO -> Entity
     private Garbage create(RegisterGarbageDTO dto, Member member) {
+        if (member == null || !member.getRole().equals("user")) {
+            throw new NotUserException("Member is not a user");
+        }
+
         double organicWeight = dto.getOrganicWeight();
         double non_organicWeight = dto.getNon_organicWeight();
         double totalValue = 60 * organicWeight + 80 * non_organicWeight;
@@ -52,7 +60,22 @@ public class UserGarbageService {
     }
 
     // 등록한 쓰레기 중 수거인 매칭된 쓰레기 리스트 조회 - User
-    public List<RegisteredGarbageDTO> getRegisteredGarbages(Long userId) {
+    public List<RegisteredGarbageDTO> getRegisteredGarbages(Member user) {
+        // 사용자 객체가 null 이거나 역할이 "user"가 아닌 경우 예외를 던짐
+        if (user == null || !user.getRole().equals("user")) {
+            throw new NotUserException("Member is not a user");
+        }
+
+        // 사용자 ID가 null 인 경우 예외를 던짐
+        Long userId = user.getId();
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID is null");
+        }
+
+        // 사용자 ID로 데이터베이스에서 사용자를 조회, 없으면 예외를 던짐
+        Users foundUser = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
         return garbageRepository.findByStatus_MatchedAndUserId(true, userId)
                 .stream()
                 .map(this::convertToRegisteredGarbageDTO)
@@ -113,14 +136,22 @@ public class UserGarbageService {
     }
 
     // 저축된 총 RP값 조회
-    public double getTotalRp(Long userId, Member user) {
-        Users users = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
-
-        if (!user.getRole().equals("user")) {
-            throw new UnauthorizedAccessException("Member is not a user.");
+    public double getTotalRp(Member user) {
+        // 사용자 객체가 null 이거나 역할이 "user"가 아닌 경우 예외를 던짐
+        if (user == null || !user.getRole().equals("user")) {
+            throw new NotUserException("Member is not a user");
         }
 
-        return users.getTotalRp();
+        // 사용자 ID가 null 인 경우 예외를 던짐
+        Long userId = user.getId();
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID is null");
+        }
+
+        // 사용자 ID로 데이터베이스에서 사용자를 조회, 없으면 예외를 던짐
+        Users foundUser = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+        return foundUser.getTotalRp();
     }
 }

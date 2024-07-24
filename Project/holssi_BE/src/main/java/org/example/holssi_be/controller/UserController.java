@@ -24,9 +24,10 @@ public class UserController {
     // 저축된 총 RP값 조회
     @GetMapping("/savings")
     public ResponseDTO getTotalRP(HttpServletRequest request) {
+
         Member member = (Member) request.getAttribute("member");
-        Long userId = member.getId();
-        double totalRp = userGarbageService.getTotalRp(userId, member);
+        double totalRp = userGarbageService.getTotalRp(member);
+
         return new ResponseDTO(true, totalRp,null);
     }
 }
