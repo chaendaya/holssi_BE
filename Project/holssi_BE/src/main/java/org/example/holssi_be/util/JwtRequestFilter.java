@@ -31,16 +31,20 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final JwtTokenUtil jwtTokenUtil;
     private final CustomUserDetailsService customUserDetailsService;
-    private static final List<String> EXCLUDED_PATHS = List.of("/api/auth/**", "/api/login", "/api/admin/create", "/h2-console/**", "/api/temp/**");
+    private static final List<String> EXCLUDED_PATHS = List.of(
+            "/api/auth/.*",
+            "/api/login",
+            "/api/admin/create",
+            "/h2-console/.*",
+            "/api/temp/.*"
+    );
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-
         String requestURI = request.getRequestURI();
-
         // JWT 필터를 적용하지 않을 경로 확인
-        if (EXCLUDED_PATHS.stream().anyMatch(requestURI::startsWith)) {
+        if (shouldExclude(requestURI)) {
             // 필터를 적용하지 않고 요청을 다음 필터로 전달
             chain.doFilter(request, response);
             return;
@@ -93,5 +97,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
         // 다음 필터로 요청 전달
         chain.doFilter(request, response);
+    }
+
+    private boolean shouldExclude(String requestURI) {
+        return EXCLUDED_PATHS.stream().anyMatch(pattern -> requestURI.matches(pattern));
     }
 }
