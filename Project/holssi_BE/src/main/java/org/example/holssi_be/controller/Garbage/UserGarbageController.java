@@ -3,6 +3,7 @@ package org.example.holssi_be.controller.Garbage;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.example.holssi_be.dto.Garbage.GarbageDetailsDTO;
 import org.example.holssi_be.dto.Garbage.RegisterGarbageDTO;
 import org.example.holssi_be.dto.Garbage.RegisteredGarbageDTO;
 import org.example.holssi_be.dto.ResponseDTO;
@@ -52,5 +53,15 @@ public class UserGarbageController {
         List<RegisteredGarbageDTO> registeredGarbages = userGarbageService.getRegisteredGarbages(member);
 
         return new ResponseDTO(true, registeredGarbages, null);
+    }
+
+    // 개별 쓰레기 수거인 정보
+    @GetMapping("/{garbage-id}/collectorInfo")
+    public ResponseDTO getGarbageDetails(@PathVariable("garbage-id") Long garbageId, HttpServletRequest request) {
+
+        Member member = (Member) request.getAttribute("member");
+        String collectorName = userGarbageService.getCollectorInfo(garbageId, member);
+
+        return new ResponseDTO(true, collectorName, null);
     }
 }
