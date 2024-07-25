@@ -1,10 +1,12 @@
 package org.example.holssi_be.util;
 
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 
 import java.util.stream.Collectors;
 
+@Component
 public class ValidationUtil {
 
     // 유효성 검사 로직

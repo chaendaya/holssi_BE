@@ -13,10 +13,12 @@ import org.example.holssi_be.repository.MemberRepository;
 import org.example.holssi_be.service.AuthService;
 import org.example.holssi_be.service.CollectorService;
 import org.example.holssi_be.service.UserService;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
 public class AuthUtil {
 
     // 사용자 데이터 생성, 임시 사용자 데이터 검증, 검증 결과 처리
