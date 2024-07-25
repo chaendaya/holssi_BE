@@ -3,10 +3,7 @@ package org.example.holssi_be.service.Garbage;
 import lombok.RequiredArgsConstructor;
 import org.example.holssi_be.dto.Garbage.RegisterGarbageDTO;
 import org.example.holssi_be.dto.Garbage.RegisteredGarbageDTO;
-import org.example.holssi_be.entity.domain.Garbage;
-import org.example.holssi_be.entity.domain.GarbageStatus;
-import org.example.holssi_be.entity.domain.Member;
-import org.example.holssi_be.entity.domain.Users;
+import org.example.holssi_be.entity.domain.*;
 import org.example.holssi_be.exception.NotUserException;
 import org.example.holssi_be.exception.ResourceNotFoundException;
 import org.example.holssi_be.repository.GarbageRepository;
@@ -154,4 +151,22 @@ public class UserGarbageService {
 
         return foundUser.getTotalRp();
     }
+
+    // 개별 쓰레기 수거인 정보
+    public String getCollectorInfo(Long garbageId, Member member) {
+        Garbage garbage = garbageRepository.findById(garbageId)
+                .orElseThrow(() -> new ResourceNotFoundException("Garbage not found with ID: " + garbageId));
+
+        // 사용자 객체가 null 이거나 역할이 "user"가 아닌 경우 예외를 던짐
+        if (member == null || (!member.getRole().equals("user") && !member.getRole().equals("admin"))) {
+            throw new NotUserException("Member is not a user or admin");
+        }
+
+        Collectors collector = garbage.getCollector();
+        Member members = collector.getMember();
+
+        return members.getName();
+    }
 }
+
+
