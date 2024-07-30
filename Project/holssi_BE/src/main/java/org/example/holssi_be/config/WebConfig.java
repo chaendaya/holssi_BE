@@ -19,7 +19,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authTokenInterceptor)
                 .addPathPatterns("/api/garbages/**", "/api/home", "/api/user/**") // 요청을 보낸 사용자의 member 속성이 필요한 경로
-                .excludePathPatterns("/api/auth/**", "/api/login", "/api/admin/create",
+                .excludePathPatterns("/api/auth/**", "/api/login", "/api/admin/create", "/h2-console",
                         "/h2-console/**", "/api/temp/**"); // 요청을 보낸 사용자의 member 속성이 필요 없는 경로
     }
 }
