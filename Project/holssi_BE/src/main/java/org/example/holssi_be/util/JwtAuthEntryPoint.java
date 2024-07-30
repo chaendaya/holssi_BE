@@ -25,6 +25,7 @@ public class JwtAuthEntryPoint implements AuthenticationEntryPoint, AccessDenied
 
     private final ObjectMapper objectMapper;
     private static final List<String> EXCLUDED_PATHS = List.of(
+            "/",
             "/api/auth/.*",
             "/api/login",
             "/api/admin/create",
