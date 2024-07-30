@@ -28,6 +28,7 @@ public class JwtAuthEntryPoint implements AuthenticationEntryPoint, AccessDenied
             "/api/auth/.*",
             "/api/login",
             "/api/admin/create",
+            "/h2-console",
             "/h2-console/.*",
             "/api/temp/.*"
     );

@@ -35,6 +35,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             "/api/auth/.*",
             "/api/login",
             "/api/admin/create",
+            "/h2-console",
             "/h2-console/.*",
             "/api/temp/.*"
     );
