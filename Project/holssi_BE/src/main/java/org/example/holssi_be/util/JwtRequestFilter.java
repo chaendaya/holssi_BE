@@ -33,6 +33,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private final CustomUserDetailsService customUserDetailsService;
     private static final List<String> EXCLUDED_PATHS = List.of(
             "/",
+            "/index.html",
+            "/favicon.ico",
             "/api/auth/.*",
             "/api/login",
             "/api/admin/create",
@@ -102,6 +104,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     }
 
     private boolean shouldExclude(String requestURI) {
+        // `/` 경로는 반드시 제외되도록 수정
+        if ("/".equals(requestURI)) {
+            return true;
+        }
         return EXCLUDED_PATHS.stream().anyMatch(pattern -> requestURI.matches(pattern));
     }
 }
