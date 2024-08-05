@@ -2,10 +2,7 @@ package org.example.holssi_be.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.holssi_be.dto.AuthDTO;
-import org.example.holssi_be.dto.CollectorDTO;
-import org.example.holssi_be.dto.ResponseDTO;
-import org.example.holssi_be.dto.UserDTO;
+import org.example.holssi_be.dto.*;
 import org.example.holssi_be.repository.MemberRepository;
 import org.example.holssi_be.service.*;
 import org.example.holssi_be.util.AuthUtil;
@@ -51,8 +48,13 @@ public class AuthController {
     }
 
     @PostMapping("/checkEmail")
-    public ResponseDTO checkEmail( /* DTO 인자로 받기 */) {
-        return new ResponseDTO(true, null, null);
+    public ResponseDTO checkEmail(@RequestBody IdCheckRequestDto idCheckRequestDto, BindingResult bindingResult) {
+        boolean isExisted = authService.emailCheck(idCheckRequestDto.getEmail());
+        if (isExisted) {
+            return new ResponseDTO(false, "duplicate id", null);
+        } else {
+            return new ResponseDTO(true, "email available", null);
+        }
     }
 
     @PostMapping("/sendEmail")
