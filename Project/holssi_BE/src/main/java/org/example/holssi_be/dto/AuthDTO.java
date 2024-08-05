@@ -15,4 +15,7 @@ public class AuthDTO {
     private String tempKey;
 
     private String code;
+
+    @NotBlank
+    private String email;
 }

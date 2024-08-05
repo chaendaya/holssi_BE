@@ -1,17 +1,28 @@
 package org.example.holssi_be.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.holssi_be.entity.domain.Member;
+import org.example.holssi_be.repository.MemberRepository;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
+    // 이메일 중복확인
+    private final MemberRepository memberRepository;
 
+    public boolean emailCheck(String email) {
+        Optional<Member> member = memberRepository.findByEmail(email);
+        return member.isPresent();
+    }
+
+    // 이메일, 왓츠앱 인증
     private final RedisTemplate<String, String> redisTemplate;
 
     private final Random random = new Random();
