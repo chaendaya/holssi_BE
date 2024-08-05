@@ -4,8 +4,8 @@ import lombok.Data;
 
 @Data
 public class GarbageDetailsDTO {
-    private Double organicWeight;
-    private Double non_organicWeight;
+    private ComponentDTO organic;
+    private ComponentDTO non_organic;
     private Double totalWeight;
     private Double totalValue;
 }

@@ -51,6 +51,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(NotAdminException.class)
+    public ResponseEntity<ResponseDTO> handleNotAdminException(NotAdminException ex) {
+        ResponseDTO response = new ResponseDTO(false, null, ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ResponseDTO> handleIllegalArgumentException(IllegalArgumentException ex) {
         ResponseDTO responseDTO = new ResponseDTO(false, null, ex.getMessage());
