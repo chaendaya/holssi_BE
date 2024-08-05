@@ -2,6 +2,7 @@ package org.example.holssi_be.service.Garbage;
 
 import lombok.RequiredArgsConstructor;
 import org.example.holssi_be.dto.Garbage.AcceptGarbageDTO;
+import org.example.holssi_be.dto.Garbage.ComponentDTO;
 import org.example.holssi_be.dto.Garbage.GarbageDetailsDTO;
 import org.example.holssi_be.dto.Garbage.GarbageInfoDTO;
 import org.example.holssi_be.entity.domain.*;
@@ -27,7 +28,7 @@ public class CollectorGarbageService {
     // 매칭 대기 중인 쓰레기 리스트 조회 - Collector
     public List<GarbageInfoDTO> getWaitingGarbages(Member collector) {
         if (collector == null || !collector.getRole().equals("collector")) {
-            throw new NotCollectorException("Member is not a collector");
+            throw new NotCollectorException();
         }
 
         String location = collector.getCollector().getLocation();
@@ -44,7 +45,7 @@ public class CollectorGarbageService {
                 .orElseThrow(() -> new ResourceNotFoundException("Garbage not found with ID: " + garbageId));
 
         if (collector == null || !collector.getRole().equals("collector")) {
-            throw new NotCollectorException("Member is not a collector");
+            throw new NotCollectorException();
         }
 
         Collectors collectorEntity = collector.getCollector();
@@ -60,7 +61,7 @@ public class CollectorGarbageService {
     // 수거인 자신이 수락한 쓰레기 리스트 조회 - Collector
     public List<GarbageInfoDTO> getAcceptedGarbages(Member collector) {
         if (collector == null || !collector.getRole().equals("collector")) {
-            throw new NotCollectorException("Member is not a collector");
+            throw new NotCollectorException();
         }
 
         Collectors collectorEntity = collector.getCollector();
@@ -78,7 +79,7 @@ public class CollectorGarbageService {
                 .orElseThrow(() -> new ResourceNotFoundException("Garbage not found with ID: " + garbageId));
 
         if (collector == null || !collector.getRole().equals("collector")) {
-            throw new NotCollectorException("Member is not a collector");
+            throw new NotCollectorException();
         }
 
         return convertToGarbageDetailsDTO(garbage);
@@ -104,9 +105,18 @@ public class CollectorGarbageService {
     }
 
     private GarbageDetailsDTO convertToGarbageDetailsDTO(Garbage garbage) {
+        ComponentDTO organic = new ComponentDTO();
+        ComponentDTO non_organic = new ComponentDTO();
+
+        organic.setRP(garbage.getOrganicWeight() * 60);
+        organic.setBreat(garbage.getOrganicWeight());
+
+        non_organic.setRP(garbage.getNon_organicWeight() * 80);
+        non_organic.setBreat(garbage.getNon_organicWeight());
+
         GarbageDetailsDTO dto = new GarbageDetailsDTO();
-        dto.setOrganicWeight(garbage.getOrganicWeight());
-        dto.setNon_organicWeight(garbage.getNon_organicWeight());
+        dto.setOrganic(organic);
+        dto.setNon_organic(non_organic);
         dto.setTotalWeight(garbage.getTotalWeight());
         dto.setTotalValue(garbage.getTotalValue());
         return dto;
@@ -118,7 +128,7 @@ public class CollectorGarbageService {
                 .orElseThrow(() -> new ResourceNotFoundException("Garbage not found with ID: " + garbageId));
 
         if (collector == null || !collector.getRole().equals("collector")) {
-            throw new NotCollectorException("Member is not a collector");
+            throw new NotCollectorException();
         }
 
         Collectors collectorEntity = collector.getCollector();
@@ -137,7 +147,7 @@ public class CollectorGarbageService {
                 .orElseThrow(() -> new ResourceNotFoundException("Garbage not found with ID: " + garbageId));
 
         if (collector == null || !collector.getRole().equals("collector")) {
-            throw new NotCollectorException("Member is not a collector");
+            throw new NotCollectorException();
         }
 
         GarbageStatus status = garbage.getStatus();

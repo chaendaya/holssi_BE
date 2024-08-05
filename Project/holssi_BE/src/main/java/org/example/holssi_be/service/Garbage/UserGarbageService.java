@@ -24,7 +24,7 @@ public class UserGarbageService {
     // 쓰레기 등록 - User
     public void registerGarbage(RegisterGarbageDTO registerGarbageDTO, Member member) {
         if (member == null || !member.getRole().equals("user")) {
-            throw new NotUserException("Member is not a user");
+            throw new NotUserException();
         }
 
         Garbage garbage = create(registerGarbageDTO, member);
@@ -34,7 +34,7 @@ public class UserGarbageService {
     // 쓰레기 등록 DTO -> Entity
     private Garbage create(RegisterGarbageDTO dto, Member member) {
         if (member == null || !member.getRole().equals("user")) {
-            throw new NotUserException("Member is not a user");
+            throw new NotUserException();
         }
 
         double organicWeight = dto.getOrganicWeight();
@@ -60,7 +60,7 @@ public class UserGarbageService {
     public List<RegisteredGarbageDTO> getRegisteredGarbages(Member user) {
         // 사용자 객체가 null 이거나 역할이 "user"가 아닌 경우 예외를 던짐
         if (user == null || !user.getRole().equals("user")) {
-            throw new NotUserException("Member is not a user");
+            throw new NotUserException();
         }
 
         // 사용자 ID가 null 인 경우 예외를 던짐
@@ -136,7 +136,7 @@ public class UserGarbageService {
     public double getTotalRp(Member user) {
         // 사용자 객체가 null 이거나 역할이 "user"가 아닌 경우 예외를 던짐
         if (user == null || !user.getRole().equals("user")) {
-            throw new NotUserException("Member is not a user");
+            throw new NotUserException();
         }
 
         // 사용자 ID가 null 인 경우 예외를 던짐
@@ -159,7 +159,7 @@ public class UserGarbageService {
 
         // 사용자 객체가 null 이거나 역할이 "user"가 아닌 경우 예외를 던짐
         if (member == null || (!member.getRole().equals("user") && !member.getRole().equals("admin"))) {
-            throw new NotUserException("Member is not a user or admin");
+            throw new NotUserException();
         }
 
         Collectors collector = garbage.getCollector();
