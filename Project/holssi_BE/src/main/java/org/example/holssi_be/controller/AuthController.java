@@ -48,7 +48,7 @@ public class AuthController {
     }
 
     @PostMapping("/checkEmail")
-    public ResponseDTO checkEmail(@RequestBody IdCheckRequestDto idCheckRequestDto, BindingResult bindingResult) {
+    public ResponseDTO checkEmail(@RequestBody IdCheckRequestDTO idCheckRequestDto, BindingResult bindingResult) {
         boolean isExisted = authService.emailCheck(idCheckRequestDto.getEmail());
         if (isExisted) {
             return new ResponseDTO(false, "duplicate id", null);

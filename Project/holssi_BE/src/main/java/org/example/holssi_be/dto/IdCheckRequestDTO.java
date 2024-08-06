@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class IdCheckRequestDto {
+public class IdCheckRequestDTO {
 
     @NotBlank
     private String email;
