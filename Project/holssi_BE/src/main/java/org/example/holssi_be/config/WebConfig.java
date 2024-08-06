@@ -27,7 +27,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // 모든 엔드포인트에 대해 CORS를 설정
-                .allowedOrigins("http://ec2-43-202-58-157.ap-northeast-2.compute.amazonaws.com:8090") // 허용할 도메인 (포트 번호 포함)
+                .allowedOrigins("*") // 허용할 도메인 (포트 번호 포함)
                 .allowedMethods("GET", "POST", "PUT", "DELETE") // 허용할 HTTP 메소드
                 .allowedHeaders("*") // 허용할 헤더
                 .allowCredentials(true); // 쿠키 허용 여부
