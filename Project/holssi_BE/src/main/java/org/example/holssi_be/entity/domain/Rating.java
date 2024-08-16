@@ -11,7 +11,11 @@ public class Rating {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int rating; // 평점 (1-5)
+    private Integer rating; // 평점 (1-5)
+
+    @OneToOne
+    @JoinColumn(name = "garbage_id")
+    private Garbage garbage;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -20,4 +24,5 @@ public class Rating {
     @ManyToOne
     @JoinColumn(name = "collector_id")
     private Collectors collector;
+
 }

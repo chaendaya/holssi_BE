@@ -4,15 +4,18 @@ import lombok.RequiredArgsConstructor;
 import org.example.holssi_be.dto.Garbage.RegisterGarbageDTO;
 import org.example.holssi_be.dto.Garbage.RegisteredGarbageDTO;
 import org.example.holssi_be.entity.domain.*;
+import org.example.holssi_be.exception.NotCollectorException;
 import org.example.holssi_be.exception.NotUserException;
 import org.example.holssi_be.exception.ResourceNotFoundException;
 import org.example.holssi_be.repository.GarbageRepository;
+import org.example.holssi_be.repository.RatingRepository;
 import org.example.holssi_be.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +23,8 @@ public class UserGarbageService {
 
     private final GarbageRepository garbageRepository;
     private final UserRepository userRepository;
+    private final RatingRepository ratingRepository;
+
 
     // 쓰레기 등록 - User
     public void registerGarbage(RegisterGarbageDTO registerGarbageDTO, Member member) {
@@ -167,6 +172,36 @@ public class UserGarbageService {
 
         return members.getName();
     }
-}
 
+    // 개별 쓰레기 수거인 평가
+    public void rateCollector (Long garbageId, Member user, Integer score) {
+
+        Garbage garbage = garbageRepository.findById(garbageId)
+                .orElseThrow(() -> new ResourceNotFoundException("Garbage not found with ID: " + garbageId));
+
+        // 사용자 객체가 null 이거나 역할이 "user"가 아닌 경우 예외를 던짐
+        if (user == null || !user.getRole().equals("user")) {
+            throw new NotUserException();
+        }
+
+        // 사용자 ID가 null 인 경우 예외를 던짐
+        Long userId = user.getId();
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID is null");
+        }
+
+        Rating rating = garbage.getRating();
+
+        if (rating == null) {
+            rating = new Rating();
+            rating.setGarbage(garbage);
+            rating.setUser(garbage.getUser());
+            rating.setCollector(garbage.getCollector());
+        }
+
+        rating.setRating(score);
+
+        ratingRepository.save(rating);
+    }
+}
 
