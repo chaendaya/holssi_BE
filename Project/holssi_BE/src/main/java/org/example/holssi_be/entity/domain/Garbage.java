@@ -33,6 +33,10 @@ public class Garbage {
     private Collectors collector;
 
     @OneToOne(mappedBy = "garbage", cascade = CascadeType.ALL)
+    private Rating rating;
+
+
+    @OneToOne(mappedBy = "garbage", cascade = CascadeType.ALL)
     private GarbageStatus status;
 
     // registrationDate 필드 자동으로 설정

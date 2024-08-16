@@ -9,6 +9,7 @@ import org.example.holssi_be.dto.Garbage.RegisteredGarbageDTO;
 import org.example.holssi_be.dto.ResponseDTO;
 import org.example.holssi_be.entity.domain.Member;
 import org.example.holssi_be.service.Garbage.UserGarbageService;
+import org.example.holssi_be.service.RatingRequest;
 import org.example.holssi_be.util.ValidationUtil;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -63,5 +64,19 @@ public class UserGarbageController {
         String collectorName = userGarbageService.getCollectorInfo(garbageId, member);
 
         return new ResponseDTO(true, collectorName, null);
+    }
+
+    // 개별 쓰레기 수거인 평가
+    @PostMapping("/{garbage-id}/rating")
+    public ResponseDTO rateCollector(@PathVariable("garbage-id") Long garbageId, @RequestBody RatingRequest ratingRequest, HttpServletRequest request) {
+        Integer score = ratingRequest.getScore();
+        if (score == null || score < 1 || score > 5) {
+            throw new IllegalArgumentException("Score must be between 1 and 5");
+        }
+
+        Member member = (Member) request.getAttribute("member");
+
+        userGarbageService.rateCollector(garbageId, member, score);
+        return new ResponseDTO(true, "Rating completed !", null);
     }
 }
