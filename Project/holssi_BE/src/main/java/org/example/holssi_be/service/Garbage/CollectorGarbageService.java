@@ -196,6 +196,7 @@ public class CollectorGarbageService {
             location.setGarbage(garbage);
             location.setCollector(garbage.getCollector());
             location.setUser(garbage.getUser());
+            garbage.getCollector().setCollectorLocation(location);
         }
 
         location.setLatitude(latitude);
