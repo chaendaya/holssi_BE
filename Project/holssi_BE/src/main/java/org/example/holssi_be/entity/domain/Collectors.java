@@ -30,6 +30,10 @@ public class Collectors {
     @JsonIgnore
     private Set<Rating> ratings;
 
+    @OneToOne
+    @JoinColumn(name = "collector_id")
+    private CollectorLocation collectorLocation;
+
     public String getEmail() {
         return member.getEmail();
     }

@@ -1,4 +1,4 @@
-package org.example.holssi_be.service;
+package org.example.holssi_be.request;
 
 public class RatingRequest {
     private Integer score;
