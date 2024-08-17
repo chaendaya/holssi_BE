@@ -3,15 +3,13 @@ package org.example.holssi_be.controller.Garbage;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.holssi_be.dto.Garbage.GarbageDetailsDTO;
 import org.example.holssi_be.dto.Garbage.RegisterGarbageDTO;
 import org.example.holssi_be.dto.Garbage.RegisteredGarbageDTO;
-import org.example.holssi_be.dto.LocationDto;
+import org.example.holssi_be.dto.LocationDTO;
+import org.example.holssi_be.dto.RatingRequestDTO;
 import org.example.holssi_be.dto.ResponseDTO;
 import org.example.holssi_be.entity.domain.Member;
-import org.example.holssi_be.request.LocationRequest;
 import org.example.holssi_be.service.Garbage.UserGarbageService;
-import org.example.holssi_be.request.RatingRequest;
 import org.example.holssi_be.util.ValidationUtil;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -73,7 +71,7 @@ public class UserGarbageController {
     public ResponseDTO getLocation(@PathVariable("garbage-id") Long garbageId, HttpServletRequest request) {
 
         Member member = (Member) request.getAttribute("member");
-        LocationDto location = userGarbageService.getLocation(garbageId, member);
+        LocationDTO location = userGarbageService.getLocation(garbageId, member);
 
         return new ResponseDTO(true, location, null);
     }
@@ -81,8 +79,8 @@ public class UserGarbageController {
 
     // 개별 쓰레기 수거인 평가
     @PostMapping("/{garbage-id}/rating")
-    public ResponseDTO rateCollector(@PathVariable("garbage-id") Long garbageId, @RequestBody RatingRequest ratingRequest, HttpServletRequest request) {
-        Integer score = ratingRequest.getScore();
+    public ResponseDTO rateCollector(@PathVariable("garbage-id") Long garbageId, @RequestBody @Valid RatingRequestDTO ratingRequestDTO, HttpServletRequest request) {
+        Integer score = ratingRequestDTO.getScore();
         if (score == null || score < 1 || score > 5) {
             throw new IllegalArgumentException("Score must be between 1 and 5");
         }

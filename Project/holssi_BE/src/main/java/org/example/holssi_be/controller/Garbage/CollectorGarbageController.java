@@ -6,10 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.example.holssi_be.dto.Garbage.AcceptGarbageDTO;
 import org.example.holssi_be.dto.Garbage.GarbageDetailsDTO;
 import org.example.holssi_be.dto.Garbage.GarbageInfoDTO;
-import org.example.holssi_be.dto.Garbage.GarbageLocationDto;
+import org.example.holssi_be.dto.Garbage.GarbageLocationDTO;
+import org.example.holssi_be.dto.LocationRequestDTO;
 import org.example.holssi_be.dto.ResponseDTO;
 import org.example.holssi_be.entity.domain.Member;
-import org.example.holssi_be.request.LocationRequest;
 import org.example.holssi_be.service.Garbage.CollectorGarbageService;
 import org.example.holssi_be.util.ValidationUtil;
 import org.springframework.validation.BindingResult;
@@ -71,7 +71,7 @@ public class CollectorGarbageController {
     public ResponseDTO startCollection(@PathVariable("garbage-id") Long garbageId, HttpServletRequest request) {
 
         Member member = (Member) request.getAttribute("member");
-        GarbageLocationDto locationDto = collectorGarbageService.startCollection(garbageId, member);
+        GarbageLocationDTO locationDto = collectorGarbageService.startCollection(garbageId, member);
 
         return new ResponseDTO(true, locationDto, null);
     }
@@ -89,11 +89,11 @@ public class CollectorGarbageController {
     // 프론트 -> 수거인 위치 저장
     @PostMapping("/accept/{garbage-id}/tracking")
     public ResponseDTO trackingCollector(@PathVariable("garbage-id") Long garbageId,
-                                         @RequestBody LocationRequest locationRequest, HttpServletRequest request) {
+                                         @RequestBody @Valid LocationRequestDTO locationRequestDTO, HttpServletRequest request) {
 
         Member member = (Member) request.getAttribute("member");
-        Double latitude = locationRequest.getLatitude();
-        Double longitude = locationRequest.getLongitude();
+        Double latitude = locationRequestDTO.getLatitude();
+        Double longitude = locationRequestDTO.getLongitude();
 
         collectorGarbageService.updateCollectorLocation(garbageId, member, latitude, longitude);
 

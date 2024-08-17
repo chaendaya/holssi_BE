@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.holssi_be.dto.Garbage.GarbageInfoDTO;
 import org.example.holssi_be.entity.domain.Garbage;
 import org.example.holssi_be.entity.domain.Member;
-import org.example.holssi_be.exception.NotCollectorException;
+import org.example.holssi_be.exception.NotAdminException;
 import org.example.holssi_be.repository.GarbageRepository;
 import org.example.holssi_be.util.GeocodingUtil;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ public class AdminGarbageService {
 
     public List<GarbageInfoDTO> getAllWaitingGarbages(Member admin) {
         if (admin == null || !admin.getRole().equals("admin")) {
-            throw new NotCollectorException();
+            throw new NotAdminException();
         }
 
         return garbageRepository.findByStatus_Matched(false)

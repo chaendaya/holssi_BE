@@ -8,10 +8,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class IdCheckRequestDTO {
+public class LocationRequestDTO {
 
-    @NotBlank(message = "email(Id) is required")
-    private String email;
+    @NotBlank(message = "latitude is required")
+    private Double latitude;
 
+    @NotBlank(message = "longitude is required")
+    private Double longitude;
 }
-
