@@ -1,25 +1,21 @@
 package org.example.holssi_be.service.Garbage;
 
 import lombok.RequiredArgsConstructor;
-import org.example.holssi_be.dto.Garbage.GarbageDetailsDTO;
 import org.example.holssi_be.dto.Garbage.RegisterGarbageDTO;
 import org.example.holssi_be.dto.Garbage.RegisteredGarbageDTO;
-import org.example.holssi_be.dto.LocationDto;
+import org.example.holssi_be.dto.LocationDTO;
 import org.example.holssi_be.entity.domain.*;
-import org.example.holssi_be.exception.NotCollectorException;
 import org.example.holssi_be.exception.NotUserException;
 import org.example.holssi_be.exception.ResourceNotFoundException;
 import org.example.holssi_be.repository.CollectorLocationRepository;
 import org.example.holssi_be.repository.GarbageRepository;
 import org.example.holssi_be.repository.RatingRepository;
 import org.example.holssi_be.repository.UserRepository;
-import org.example.holssi_be.request.LocationRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -179,7 +175,7 @@ public class UserGarbageService {
     }
 
     // 개별 쓰레기 수거인 실시간 위치
-    public LocationDto getLocation(Long garbageId, Member user) {
+    public LocationDTO getLocation(Long garbageId, Member user) {
         Garbage garbage = garbageRepository.findById(garbageId)
                 .orElseThrow(() -> new ResourceNotFoundException("Garbage not found with ID: " + garbageId));
 
@@ -191,7 +187,7 @@ public class UserGarbageService {
         if (!status.isStartCollection() || status.isCollectionCompleted()) {
             throw new ResourceNotFoundException("Collection not started or already completed");
         }
-        return collectorLocationRepository.findLocatoinById(garbageId);
+        return collectorLocationRepository.findLocationById(garbageId);
     }
 
 

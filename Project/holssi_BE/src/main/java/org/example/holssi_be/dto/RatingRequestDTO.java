@@ -8,10 +8,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class IdCheckRequestDTO {
+public class RatingRequestDTO {
 
-    @NotBlank(message = "email(Id) is required")
-    private String email;
-
+    @NotBlank(message = "score is required")
+    private Integer score;
 }
-

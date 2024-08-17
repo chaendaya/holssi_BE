@@ -122,7 +122,7 @@ public class CollectorGarbageService {
     }
 
     // 개별 쓰레기 수거 시작
-    public GarbageLocationDto startCollection(Long garbageId, Member collector) {
+    public GarbageLocationDTO startCollection(Long garbageId, Member collector) {
         Garbage garbage = garbageRepository.findById(garbageId)
                 .orElseThrow(() -> new ResourceNotFoundException("Garbage not found with ID: " + garbageId));
 
@@ -137,7 +137,7 @@ public class CollectorGarbageService {
 
         garbageRepository.save(garbage);
 
-        GarbageLocationDto dto = new GarbageLocationDto();
+        GarbageLocationDTO dto = new GarbageLocationDTO();
         dto.setGarbageId(garbage.getId());
         dto.setLocation(garbage.getLocation());
 
@@ -147,8 +147,6 @@ public class CollectorGarbageService {
 
         return dto;
     }
-
-
 
     // 개별 쓰레기 수거 완료
     public void completeCollection(Long garbageId, Member collector) {
