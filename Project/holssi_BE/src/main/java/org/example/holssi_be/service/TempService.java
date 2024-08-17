@@ -26,7 +26,7 @@ public class TempService {
 
     public void createUser(UserDTO userDTO) {
         Member member = new Member();
-        member.setEmail(userDTO.getUserEmail());
+        member.setEmail(userDTO.getEmail());
         member.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         member.setName(userDTO.getName());
         member.setPhone(userDTO.getPhone());
@@ -43,7 +43,7 @@ public class TempService {
 
     public void createCollector(CollectorDTO collectorDTO) {
         Member member = new Member();
-        member.setEmail(collectorDTO.getCollectorEmail());
+        member.setEmail(collectorDTO.getEmail());
         member.setPassword(passwordEncoder.encode(collectorDTO.getPassword()));
         member.setName(collectorDTO.getName());
         member.setPhone(collectorDTO.getPhone());

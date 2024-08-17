@@ -25,7 +25,7 @@ public class AuthUtil {
     public static Map<String, String> createTemporaryUser(UserDTO userDTO) {
         Map<String, String> userData = new HashMap<>();
         userData.put("name", userDTO.getName());
-        userData.put("userEmail", userDTO.getUserEmail());
+        userData.put("userEmail", userDTO.getEmail());
         userData.put("password", userDTO.getPassword());
         userData.put("phone", userDTO.getPhone());
         userData.put("location", userDTO.getLocation());
@@ -37,7 +37,7 @@ public class AuthUtil {
     public static Map<String, String> createTemporaryCollector(CollectorDTO collectorDTO) {
         Map<String, String> collectorData = new HashMap<>();
         collectorData.put("name", collectorDTO.getName());
-        collectorData.put("collectorEmail", collectorDTO.getCollectorEmail());
+        collectorData.put("collectorEmail", collectorDTO.getEmail());
         collectorData.put("password", collectorDTO.getPassword());
         collectorData.put("phone", collectorDTO.getPhone());
         collectorData.put("location", collectorDTO.getLocation());
@@ -78,11 +78,11 @@ public class AuthUtil {
 
         switch (role) {
             case "user":
-                Map<Object, Object> userData = getTemporaryUser(authDTO.getTempKey(), authService);
+                Map<Object, Object> userData = getTemporaryUser(authDTO.getEmail(), authService);
                 email = (String) userData.get("userEmail");
                 break;
             case "collector":
-                Map<Object, Object> collectorData = getTemporaryCollector(authDTO.getTempKey(), authService);
+                Map<Object, Object> collectorData = getTemporaryCollector(authDTO.getEmail(), authService);
                 email = (String) collectorData.get("collectorEmail");
                 break;
             default:
@@ -97,11 +97,11 @@ public class AuthUtil {
 
         switch (role) {
             case "user":
-                Map<Object, Object> userData = getTemporaryUser(authDTO.getTempKey(), authService);
+                Map<Object, Object> userData = getTemporaryUser(authDTO.getEmail(), authService);
                 phone = (String) userData.get("phone");
                 break;
             case "collector":
-                Map<Object, Object> collectorData = getTemporaryCollector(authDTO.getTempKey(), authService);
+                Map<Object, Object> collectorData = getTemporaryCollector(authDTO.getEmail(), authService);
                 phone = (String) collectorData.get("phone");
                 break;
             default:
@@ -116,10 +116,10 @@ public class AuthUtil {
 
         switch (role) {
             case "user":
-                tempData = getTemporaryUser(authDTO.getTempKey(), authService);
+                tempData = getTemporaryUser(authDTO.getEmail(), authService);
                 break;
             case "collector":
-                tempData = getTemporaryCollector(authDTO.getTempKey(), authService);
+                tempData = getTemporaryCollector(authDTO.getEmail(), authService);
                 break;
             default:
                 throw new InvalidRoleException("Invalid role specified.");
@@ -127,7 +127,7 @@ public class AuthUtil {
 
         if (verified && !tempData.isEmpty()) {
             Member member = new Member();
-            member.setEmail(authDTO.getTempKey());
+            member.setEmail(authDTO.getEmail());
             member.setPassword((String) tempData.get("password"));
             member.setName((String) tempData.get("name"));
             member.setPhone((String) tempData.get("phone"));
@@ -141,20 +141,20 @@ public class AuthUtil {
                 user.setAccount((String) tempData.get("account"));
                 user.setBank((String) tempData.get("bank"));
                 userService.save(user);
-                authService.deleteTemporaryUser(authDTO.getTempKey());
+                authService.deleteTemporaryUser(authDTO.getEmail());
             } else if (role.equals("collector")) {
                 Collectors collector = new Collectors();
                 collector.setMember(member);
                 collector.setLocation((String) tempData.get("location"));
                 collectorService.save(collector);
-                authService.deleteTemporaryCollector(authDTO.getTempKey());
+                authService.deleteTemporaryCollector(authDTO.getEmail());
             }
             return new ResponseDTO(true, "Verification Completed.", null);
         } else {
             if (role.equals("user")) {
-                authService.deleteTemporaryUser(authDTO.getTempKey());
+                authService.deleteTemporaryUser(authDTO.getEmail());
             } else {
-                authService.deleteTemporaryCollector(authDTO.getTempKey());
+                authService.deleteTemporaryCollector(authDTO.getEmail());
             }
             throw new InvalidRoleException("Verification Code does not match.");
         }

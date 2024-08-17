@@ -17,7 +17,4 @@ public class TwilioConfig {
     @Value("${twilio.phone.number}")
     private String fromNumber;
 
-    @Value("${twilio.template.sid}")
-    private String templateSid;
-
 }

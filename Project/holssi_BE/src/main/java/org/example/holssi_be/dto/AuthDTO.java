@@ -11,11 +11,9 @@ public class AuthDTO {
     @NotBlank(message = "role is required")
     private String role;
 
-    @NotBlank(message = "tempKey is required")
-    private String tempKey;
+    @NotBlank(message = "email(tempKey) is required")
+    private String email;
 
     private String code;
 
-    @NotBlank
-    private String email;
 }

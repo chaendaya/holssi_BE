@@ -21,7 +21,7 @@ public class AdminService {
 
     public void createAdmin(AdminDTO adminDTO) {
         Member member = new Member();
-        member.setEmail(adminDTO.getAdminEmail());
+        member.setEmail(adminDTO.getEmail());
         member.setPassword(passwordEncoder.encode(adminDTO.getPassword()));
         member.setName(adminDTO.getName());
         member.setPhone(adminDTO.getPhone());

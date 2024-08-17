@@ -32,7 +32,7 @@ public class AuthController {
         ValidationUtil.validateRequest(bindingResult);
 
         Map<String, String> userData = AuthUtil.createTemporaryUser(userDTO);
-        authService.saveTemporaryUser(userDTO.getUserEmail(), userData);
+        authService.saveTemporaryUser(userDTO.getEmail(), userData);
 
         return new ResponseDTO(true, null, null);
     }
@@ -42,7 +42,7 @@ public class AuthController {
         ValidationUtil.validateRequest(bindingResult);
 
         Map<String, String> collectorData = AuthUtil.createTemporaryCollector(collectorDTO);
-        authService.saveTemporaryCollector(collectorDTO.getCollectorEmail(), collectorData);
+        authService.saveTemporaryCollector(collectorDTO.getEmail(), collectorData);
 
         return new ResponseDTO(true, null, null);
     }

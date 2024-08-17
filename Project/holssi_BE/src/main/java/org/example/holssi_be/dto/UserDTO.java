@@ -9,8 +9,8 @@ public class UserDTO {
     @NotBlank(message = "name is required")
     private String name;
 
-    @NotBlank(message = "userEmail is required")
-    private String userEmail;
+    @NotBlank(message = "user's email is required")
+    private String email;
 
     @NotBlank(message = "password is required")
     private String password;

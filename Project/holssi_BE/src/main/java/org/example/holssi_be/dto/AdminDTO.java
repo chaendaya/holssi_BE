@@ -9,8 +9,8 @@ public class AdminDTO {
     @NotBlank(message = "name is required")
     private String name;
 
-    @NotBlank(message = "adminEmail is required")
-    private String adminEmail;
+    @NotBlank(message = "admin's email is required")
+    private String email;
 
     @NotBlank(message = "password is required")
     private String password;
