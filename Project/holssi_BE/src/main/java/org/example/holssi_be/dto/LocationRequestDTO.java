@@ -1,6 +1,7 @@
 package org.example.holssi_be.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,9 +11,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class LocationRequestDTO {
 
-    @NotBlank(message = "latitude is required")
+    @NotNull(message = "latitude is required")
     private Double latitude;
 
-    @NotBlank(message = "longitude is required")
+    @NotNull(message = "longitude is required")
     private Double longitude;
 }
