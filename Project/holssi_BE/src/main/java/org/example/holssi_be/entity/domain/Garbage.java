@@ -54,5 +54,6 @@ public class Garbage {
         long diffInMillies = Math.abs(new Date().getTime() - registrationDate.getTime());
         return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
     }
+
 }
 

@@ -1,10 +1,7 @@
 package org.example.holssi_be.service.Garbage;
 
 import lombok.RequiredArgsConstructor;
-import org.example.holssi_be.dto.Garbage.AcceptGarbageDTO;
-import org.example.holssi_be.dto.Garbage.ComponentDTO;
-import org.example.holssi_be.dto.Garbage.GarbageDetailsDTO;
-import org.example.holssi_be.dto.Garbage.GarbageInfoDTO;
+import org.example.holssi_be.dto.Garbage.*;
 import org.example.holssi_be.entity.domain.*;
 import org.example.holssi_be.exception.NotCollectorException;
 import org.example.holssi_be.exception.ResourceNotFoundException;
@@ -125,7 +122,7 @@ public class CollectorGarbageService {
     }
 
     // 개별 쓰레기 수거 시작
-    public void startCollection(Long garbageId, Member collector) {
+    public GarbageLocationDto startCollection(Long garbageId, Member collector) {
         Garbage garbage = garbageRepository.findById(garbageId)
                 .orElseThrow(() -> new ResourceNotFoundException("Garbage not found with ID: " + garbageId));
 
@@ -139,6 +136,16 @@ public class CollectorGarbageService {
         status.setStartCollection(true);
 
         garbageRepository.save(garbage);
+
+        GarbageLocationDto dto = new GarbageLocationDto();
+        dto.setGarbageId(garbage.getId());
+        dto.setLocation(garbage.getLocation());
+
+        double[] coordinates = geocodingUtil.getCoordinates(garbage.getLocation());
+        dto.setLatitude(coordinates[0]);
+        dto.setLongitude(coordinates[1]);
+
+        return dto;
     }
 
 

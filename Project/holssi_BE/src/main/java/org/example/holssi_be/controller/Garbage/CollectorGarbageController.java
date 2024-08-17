@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.holssi_be.dto.Garbage.AcceptGarbageDTO;
 import org.example.holssi_be.dto.Garbage.GarbageDetailsDTO;
 import org.example.holssi_be.dto.Garbage.GarbageInfoDTO;
+import org.example.holssi_be.dto.Garbage.GarbageLocationDto;
 import org.example.holssi_be.dto.ResponseDTO;
 import org.example.holssi_be.entity.domain.Member;
 import org.example.holssi_be.request.LocationRequest;
@@ -70,9 +71,9 @@ public class CollectorGarbageController {
     public ResponseDTO startCollection(@PathVariable("garbage-id") Long garbageId, HttpServletRequest request) {
 
         Member member = (Member) request.getAttribute("member");
-        collectorGarbageService.startCollection(garbageId, member);
+        GarbageLocationDto locationDto = collectorGarbageService.startCollection(garbageId, member);
 
-        return new ResponseDTO(true, "Collection started", null);
+        return new ResponseDTO(true, locationDto, null);
     }
 
     // 개별 쓰레기 수거 완료
