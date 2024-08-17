@@ -3,10 +3,13 @@ package org.example.holssi_be.controller.Garbage;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.example.holssi_be.dto.Garbage.GarbageDetailsDTO;
 import org.example.holssi_be.dto.Garbage.RegisterGarbageDTO;
 import org.example.holssi_be.dto.Garbage.RegisteredGarbageDTO;
+import org.example.holssi_be.dto.LocationDto;
 import org.example.holssi_be.dto.ResponseDTO;
 import org.example.holssi_be.entity.domain.Member;
+import org.example.holssi_be.request.LocationRequest;
 import org.example.holssi_be.service.Garbage.UserGarbageService;
 import org.example.holssi_be.request.RatingRequest;
 import org.example.holssi_be.util.ValidationUtil;
@@ -64,6 +67,17 @@ public class UserGarbageController {
 
         return new ResponseDTO(true, collectorName, null);
     }
+
+    // 개별 쓰레기 수거인 실시간 위치
+    @GetMapping("/{garbage-id}/location")
+    public ResponseDTO getLocation(@PathVariable("garbage-id") Long garbageId, HttpServletRequest request) {
+
+        Member member = (Member) request.getAttribute("member");
+        LocationDto location = userGarbageService.getLocation(garbageId, member);
+
+        return new ResponseDTO(true, location, null);
+    }
+
 
     // 개별 쓰레기 수거인 평가
     @PostMapping("/{garbage-id}/rating")

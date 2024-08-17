@@ -1,15 +1,19 @@
 package org.example.holssi_be.service.Garbage;
 
 import lombok.RequiredArgsConstructor;
+import org.example.holssi_be.dto.Garbage.GarbageDetailsDTO;
 import org.example.holssi_be.dto.Garbage.RegisterGarbageDTO;
 import org.example.holssi_be.dto.Garbage.RegisteredGarbageDTO;
+import org.example.holssi_be.dto.LocationDto;
 import org.example.holssi_be.entity.domain.*;
 import org.example.holssi_be.exception.NotCollectorException;
 import org.example.holssi_be.exception.NotUserException;
 import org.example.holssi_be.exception.ResourceNotFoundException;
+import org.example.holssi_be.repository.CollectorLocationRepository;
 import org.example.holssi_be.repository.GarbageRepository;
 import org.example.holssi_be.repository.RatingRepository;
 import org.example.holssi_be.repository.UserRepository;
+import org.example.holssi_be.request.LocationRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
@@ -24,6 +28,7 @@ public class UserGarbageService {
     private final GarbageRepository garbageRepository;
     private final UserRepository userRepository;
     private final RatingRepository ratingRepository;
+    private final CollectorLocationRepository collectorLocationRepository;
 
 
     // 쓰레기 등록 - User
@@ -172,6 +177,23 @@ public class UserGarbageService {
 
         return members.getName();
     }
+
+    // 개별 쓰레기 수거인 실시간 위치
+    public LocationDto getLocation(Long garbageId, Member user) {
+        Garbage garbage = garbageRepository.findById(garbageId)
+                .orElseThrow(() -> new ResourceNotFoundException("Garbage not found with ID: " + garbageId));
+
+        if (user == null || !user.getRole().equals("user")) {
+            throw new NotUserException();
+        }
+
+        GarbageStatus status = garbage.getStatus();
+        if (!status.isStartCollection() || status.isCollectionCompleted()) {
+            throw new ResourceNotFoundException("Collection not started or already completed");
+        }
+        return collectorLocationRepository.findLocatoinById(garbageId);
+    }
+
 
     // 개별 쓰레기 수거인 평가
     public void rateCollector (Long garbageId, Member user, Integer score) {
