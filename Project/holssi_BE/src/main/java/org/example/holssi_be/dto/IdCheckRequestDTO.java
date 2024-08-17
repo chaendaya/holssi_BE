@@ -13,6 +13,5 @@ public class IdCheckRequestDTO {
     @NotBlank
     private String email;
 
-
 }
 
