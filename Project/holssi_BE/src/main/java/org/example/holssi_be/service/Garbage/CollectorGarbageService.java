@@ -8,6 +8,7 @@ import org.example.holssi_be.dto.Garbage.GarbageInfoDTO;
 import org.example.holssi_be.entity.domain.*;
 import org.example.holssi_be.exception.NotCollectorException;
 import org.example.holssi_be.exception.ResourceNotFoundException;
+import org.example.holssi_be.repository.CollectorLocationRepository;
 import org.example.holssi_be.repository.GarbageRepository;
 import org.example.holssi_be.util.GeocodingUtil;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class CollectorGarbageService {
 
     private final GarbageRepository garbageRepository;
     private final GeocodingUtil geocodingUtil;
+    private final CollectorLocationRepository collectorLocationRepository;
 
     // 매칭 대기 중인 쓰레기 리스트 조회 - Collector
     public List<GarbageInfoDTO> getWaitingGarbages(Member collector) {
@@ -169,5 +171,30 @@ public class CollectorGarbageService {
 
             garbageRepository.save(garbage);
         }
+    }
+
+    // 프론트 -> 수거인 위치 저장
+    public void updateCollectorLocation(Long garbageId, Member collector, Double latitude, Double longitude) {
+        Garbage garbage = garbageRepository.findById(garbageId)
+                .orElseThrow(() -> new ResourceNotFoundException("Garbage not found with ID: " + garbageId));
+
+        if (collector == null || !collector.getRole().equals("collector")) {
+            throw new NotCollectorException();
+        }
+
+        CollectorLocation location = garbage.getCollectorLocation();
+
+        if (location == null) {
+            location = new CollectorLocation();
+            location.setGarbage(garbage);
+            location.setCollector(garbage.getCollector());
+            location.setUser(garbage.getUser());
+        }
+
+        location.setLatitude(latitude);
+        location.setLongitude(longitude);
+        location.setTimestamp(LocalDateTime.now());
+
+        collectorLocationRepository.save(location);
     }
 }

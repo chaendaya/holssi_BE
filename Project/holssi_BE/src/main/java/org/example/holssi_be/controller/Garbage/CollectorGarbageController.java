@@ -8,6 +8,7 @@ import org.example.holssi_be.dto.Garbage.GarbageDetailsDTO;
 import org.example.holssi_be.dto.Garbage.GarbageInfoDTO;
 import org.example.holssi_be.dto.ResponseDTO;
 import org.example.holssi_be.entity.domain.Member;
+import org.example.holssi_be.request.LocationRequest;
 import org.example.holssi_be.service.Garbage.CollectorGarbageService;
 import org.example.holssi_be.util.ValidationUtil;
 import org.springframework.validation.BindingResult;
@@ -82,5 +83,19 @@ public class CollectorGarbageController {
         collectorGarbageService.completeCollection(garbageId, member);
 
         return new ResponseDTO(true, "Collection completed and totalRp updated !", null);
+    }
+
+    // 프론트 -> 수거인 위치 저장
+    @PostMapping("/accept/{garbage-id}/tracking")
+    public ResponseDTO trackingCollector(@PathVariable("garbage-id") Long garbageId,
+                                         @RequestBody LocationRequest locationRequest, HttpServletRequest request) {
+
+        Member member = (Member) request.getAttribute("member");
+        Double latitude = locationRequest.getLatitude();
+        Double longitude = locationRequest.getLongitude();
+
+        collectorGarbageService.updateCollectorLocation(garbageId, member, latitude, longitude);
+
+        return new ResponseDTO(true, "location updated !", null);
     }
 }
