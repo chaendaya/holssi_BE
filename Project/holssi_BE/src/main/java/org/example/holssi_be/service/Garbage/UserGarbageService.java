@@ -187,7 +187,11 @@ public class UserGarbageService {
         if (!status.isStartCollection() || status.isCollectionCompleted()) {
             throw new ResourceNotFoundException("Collection not started or already completed");
         }
-        return collectorLocationRepository.findLocationById(garbageId);
+
+        LocationDTO location = collectorLocationRepository.findLocationById(garbageId);
+        location.setDaysSinceRegistration(-1);
+
+        return location;
     }
 
 
