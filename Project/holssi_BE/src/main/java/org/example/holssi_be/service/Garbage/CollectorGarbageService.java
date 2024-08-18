@@ -3,6 +3,7 @@ package org.example.holssi_be.service.Garbage;
 import lombok.RequiredArgsConstructor;
 import org.example.holssi_be.dto.Garbage.*;
 import org.example.holssi_be.entity.domain.*;
+import org.example.holssi_be.exception.InvalidException;
 import org.example.holssi_be.exception.NotCollectorException;
 import org.example.holssi_be.exception.ResourceNotFoundException;
 import org.example.holssi_be.repository.CollectorLocationRepository;
@@ -45,6 +46,14 @@ public class CollectorGarbageService {
 
         if (collector == null || !collector.getRole().equals("collector")) {
             throw new NotCollectorException();
+        }
+
+        // 수거자의 지역을 가져온다
+        String collectorLocation = collector.getCollector().getLocation();
+
+        // 현재 쓰레기가 수거자의 지역에 맞는지 확인
+        if (!garbage.getLocation().contains(collectorLocation)) {
+            throw new InvalidException("The garbage location does not match collector's location.");
         }
 
         Collectors collectorEntity = collector.getCollector();

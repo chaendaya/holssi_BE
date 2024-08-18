@@ -11,11 +11,13 @@ import org.example.holssi_be.repository.CollectorLocationRepository;
 import org.example.holssi_be.repository.GarbageRepository;
 import org.example.holssi_be.repository.RatingRepository;
 import org.example.holssi_be.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +27,6 @@ public class UserGarbageService {
     private final UserRepository userRepository;
     private final RatingRepository ratingRepository;
     private final CollectorLocationRepository collectorLocationRepository;
-
 
     // 쓰레기 등록 - User
     public void registerGarbage(RegisterGarbageDTO registerGarbageDTO, Member member) {
@@ -63,7 +64,7 @@ public class UserGarbageService {
     }
 
     // 등록한 쓰레기 중 수거인 매칭된 쓰레기 리스트 조회 - User
-    public List<RegisteredGarbageDTO> getRegisteredGarbages(Member user) {
+    public Page<RegisteredGarbageDTO> getRegisteredGarbages(Member user, int page) {
         // 사용자 객체가 null 이거나 역할이 "user"가 아닌 경우 예외를 던짐
         if (user == null || !user.getRole().equals("user")) {
             throw new NotUserException();
@@ -75,14 +76,14 @@ public class UserGarbageService {
             throw new IllegalArgumentException("User ID is null");
         }
 
-        // 사용자 ID로 데이터베이스에서 사용자를 조회, 없으면 예외를 던짐
-        Users foundUser = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+        // Pageable 객체 생성 : 요청한 페이지 번호와 페이지 크기 (5개씩)
+        Pageable pageable = PageRequest.of(page, 5);
 
-        return garbageRepository.findByStatus_MatchedAndUserId(true, userId)
-                .stream()
-                .map(this::convertToRegisteredGarbageDTO)
-                .collect(java.util.stream.Collectors.toList());
+        // 데이터베이스에서 사용자 ID와 일치하는 쓰레기 정보를 페이징하여 조회
+        Page<Garbage> garbagePage = garbageRepository.findByStatus_MatchedAndUserId(true, userId, pageable);
+
+        // 조회된 Garbage 객체를 DTO로 변환하고, Page<RegisteredGarbageDTO>로 반환
+        return garbagePage.map(this::convertToRegisteredGarbageDTO);
     }
 
     private RegisteredGarbageDTO convertToRegisteredGarbageDTO(Garbage garbage) {
