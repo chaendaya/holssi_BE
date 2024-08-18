@@ -7,7 +7,8 @@ import org.example.holssi_be.dto.UserDTO;
 import org.example.holssi_be.entity.domain.Collectors;
 import org.example.holssi_be.entity.domain.Member;
 import org.example.holssi_be.entity.domain.Users;
-import org.example.holssi_be.exception.InvalidMemException;
+import org.example.holssi_be.exception.InvalidCodeException;
+import org.example.holssi_be.exception.InvalidException;
 import org.example.holssi_be.exception.InvalidRoleException;
 import org.example.holssi_be.repository.MemberRepository;
 import org.example.holssi_be.service.AuthService;
@@ -47,12 +48,12 @@ public class AuthUtil {
     public static Map<Object, Object> getTemporaryUser(String identifier, AuthService authService) {
         Map<Object, Object> userData = authService.getTemporaryUser(identifier);
         if (userData.isEmpty()) {
-            throw new InvalidMemException("Temporary user data not found.");
+            throw new InvalidException("Temporary user data not found.");
         }
 
         String storedValue = (String) userData.get("userEmail");
         if (!identifier.equals(storedValue)) {
-            throw new InvalidMemException(identifier + " does not match.");
+            throw new InvalidException(identifier + " does not match.");
         }
 
         return userData;
@@ -61,12 +62,12 @@ public class AuthUtil {
     public static Map<Object, Object> getTemporaryCollector(String identifier, AuthService authService) {
         Map<Object, Object> collectorData = authService.getTemporaryCollector(identifier);
         if (collectorData.isEmpty()) {
-            throw new InvalidMemException("Temporary collector data not found.");
+            throw new InvalidException("Temporary collector data not found.");
         }
 
         String storedValue = (String) collectorData.get("collectorEmail");
         if (!identifier.equals(storedValue)) {
-            throw new InvalidMemException(identifier + " does not match.");
+            throw new InvalidException(identifier + " does not match.");
         }
 
         return collectorData;
@@ -86,7 +87,7 @@ public class AuthUtil {
                 email = (String) collectorData.get("collectorEmail");
                 break;
             default:
-                throw new InvalidRoleException("Invalid role specified.");
+                throw new InvalidRoleException();
         }
         return email;
     }
@@ -105,7 +106,7 @@ public class AuthUtil {
                 phone = (String) collectorData.get("phone");
                 break;
             default:
-                throw new InvalidRoleException("Invalid role specified.");
+                throw new InvalidRoleException();
         }
         return phone;
     }
@@ -122,7 +123,7 @@ public class AuthUtil {
                 tempData = getTemporaryCollector(authDTO.getEmail(), authService);
                 break;
             default:
-                throw new InvalidRoleException("Invalid role specified.");
+                throw new InvalidRoleException();
         }
 
         if (verified && !tempData.isEmpty()) {
@@ -156,7 +157,7 @@ public class AuthUtil {
             } else {
                 authService.deleteTemporaryCollector(authDTO.getEmail());
             }
-            throw new InvalidRoleException("Verification Code does not match.");
+            throw new InvalidCodeException();
         }
     }
 }

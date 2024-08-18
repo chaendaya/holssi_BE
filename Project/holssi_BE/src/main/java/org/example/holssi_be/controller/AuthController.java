@@ -34,7 +34,7 @@ public class AuthController {
         Map<String, String> userData = AuthUtil.createTemporaryUser(userDTO);
         authService.saveTemporaryUser(userDTO.getEmail(), userData);
 
-        return new ResponseDTO(true, null, null);
+        return new ResponseDTO(true, null);
     }
 
     @PostMapping("/collector")
@@ -44,14 +44,16 @@ public class AuthController {
         Map<String, String> collectorData = AuthUtil.createTemporaryCollector(collectorDTO);
         authService.saveTemporaryCollector(collectorDTO.getEmail(), collectorData);
 
-        return new ResponseDTO(true, null, null);
+        return new ResponseDTO(true, null);
     }
 
     @PostMapping("/checkEmail")
     public ResponseDTO checkEmail(@RequestBody IdCheckRequestDTO idCheckRequestDto, BindingResult bindingResult) {
+        ValidationUtil.validateRequest(bindingResult);
+
         boolean isExisted = authService.emailCheck(idCheckRequestDto.getEmail());
         if (isExisted) {
-            return new ResponseDTO(false, "duplicate id", null);
+            return new ResponseDTO(false, "duplicate id",null);
         } else {
             return new ResponseDTO(true, "email available", null);
         }
@@ -67,7 +69,7 @@ public class AuthController {
         emailService.sendEmail(email, code);
         authService.saveCode(email, code);
 
-        return new ResponseDTO(true, "Verification code sent via email.", null);
+        return new ResponseDTO(true, "Verification code sent via email.",null);
     }
 
     @PostMapping("/sendWhatsApp")
@@ -80,7 +82,7 @@ public class AuthController {
         whatsAppService.sendWhatsApp(phone, code);
         authService.saveCode(phone, code);
 
-        return new ResponseDTO(true, "Verification code sent via WhatsApp.", null);
+        return new ResponseDTO(true, "Verification code sent via WhatsApp.",null);
     }
 
     @PostMapping("/verifyEmail")

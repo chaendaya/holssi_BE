@@ -30,7 +30,7 @@ public class TempController {
             tempService.createUser(userDTO);
             return new ResponseDTO(true, "User created successfully", null);
         } catch (Exception e) {
-            return new ResponseDTO(false, null, e.getMessage());
+            return new ResponseDTO(false, e.getMessage());
         }
     }
 
@@ -42,7 +42,7 @@ public class TempController {
             tempService.createCollector(collectorDTO);
             return new ResponseDTO(true, "Collector created successfully", null);
         } catch (Exception e) {
-            return new ResponseDTO(false, null, e.getMessage());
+            return new ResponseDTO(false, e.getMessage());
         }
     }
 
