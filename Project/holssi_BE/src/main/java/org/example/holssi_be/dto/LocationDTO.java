@@ -7,7 +7,14 @@ import lombok.Data;
 @AllArgsConstructor
 public class LocationDTO {
 
-    private double latitude;
-    private double longitude;
+    private Double latitude;
+    private Double longitude;
+    private Integer daysSinceRegistration;
+
+    public LocationDTO(Double latitude, Double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.daysSinceRegistration = -1;
+    }
 
 }
