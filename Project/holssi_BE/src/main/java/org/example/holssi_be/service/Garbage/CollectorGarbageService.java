@@ -1,5 +1,6 @@
 package org.example.holssi_be.service.Garbage;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.holssi_be.dto.Garbage.*;
 import org.example.holssi_be.entity.domain.*;
@@ -7,6 +8,7 @@ import org.example.holssi_be.exception.InvalidException;
 import org.example.holssi_be.exception.NotCollectorException;
 import org.example.holssi_be.exception.ResourceNotFoundException;
 import org.example.holssi_be.repository.CollectorLocationRepository;
+import org.example.holssi_be.repository.CollectorRepository;
 import org.example.holssi_be.repository.GarbageRepository;
 import org.example.holssi_be.util.GeocodingUtil;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collector;
 
 @Service
 @RequiredArgsConstructor
@@ -157,6 +160,7 @@ public class CollectorGarbageService {
         return dto;
     }
 
+    @Transactional
     // 개별 쓰레기 수거 완료
     public void completeCollection(Long garbageId, Member collector) {
         Garbage garbage = garbageRepository.findById(garbageId)
@@ -184,6 +188,9 @@ public class CollectorGarbageService {
             user.setTotalRp(currentTotalRp);
 
             garbageRepository.save(garbage);
+
+            // collectorLocation 에서 해당 수거관 위치값 제거
+            collectorLocationRepository.deleteByGarbageId(garbageId);
         }
     }
 
@@ -203,7 +210,6 @@ public class CollectorGarbageService {
             location.setGarbage(garbage);
             location.setCollector(garbage.getCollector());
             location.setUser(garbage.getUser());
-            garbage.getCollector().setCollectorLocation(location);
         }
 
         location.setLatitude(latitude);
