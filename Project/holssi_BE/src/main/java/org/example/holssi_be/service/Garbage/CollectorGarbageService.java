@@ -130,8 +130,27 @@ public class CollectorGarbageService {
         dto.setNon_organic(non_organic);
         dto.setTotalWeight(garbage.getTotalWeight());
         dto.setTotalValue(garbage.getTotalValue());
+        dto.setStatus(determineCollectionStatus(garbage));
         return dto;
     }
+
+    // 수거 상태를 결정하는 메서드
+    private String determineCollectionStatus(Garbage garbage) {
+        GarbageStatus status = garbage.getStatus();
+        if (status.isMatched()) {
+            if (status.isStartCollection() && !status.isCollectionCompleted()) {
+                return "수거중";
+            } else if (!status.isStartCollection() && status.isCollectionCompleted()) {
+                return "수거 완료";
+            } else if (!status.isStartCollection() && !status.isCollectionCompleted()) {
+                return "수거 시작 전";
+            } else if (status.isStartCollection() && status.isCollectionCompleted()) {
+                throw new IllegalStateException("수거 상태 에러: 수거 시작과 완료가 동시에 참일 수 없습니다.");
+            }
+        }
+        return "매칭 안됨";
+    }
+
 
     // 개별 쓰레기 수거 시작
     public GarbageLocationDTO startCollection(Long garbageId, Member collector) {

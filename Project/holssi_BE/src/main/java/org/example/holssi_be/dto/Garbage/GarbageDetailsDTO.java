@@ -8,4 +8,5 @@ public class GarbageDetailsDTO {
     private ComponentDTO non_organic;
     private Double totalWeight;
     private Double totalValue;
+    private String status;
 }
