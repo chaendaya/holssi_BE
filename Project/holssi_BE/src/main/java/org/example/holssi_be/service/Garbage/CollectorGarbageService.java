@@ -8,7 +8,6 @@ import org.example.holssi_be.exception.InvalidException;
 import org.example.holssi_be.exception.NotCollectorException;
 import org.example.holssi_be.exception.ResourceNotFoundException;
 import org.example.holssi_be.repository.CollectorLocationRepository;
-import org.example.holssi_be.repository.CollectorRepository;
 import org.example.holssi_be.repository.GarbageRepository;
 import org.example.holssi_be.util.GeocodingUtil;
 import org.springframework.stereotype.Service;
@@ -18,7 +17,6 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collector;
 
 @Service
 @RequiredArgsConstructor
@@ -79,7 +77,7 @@ public class CollectorGarbageService {
 
         return garbageRepository.findByCollectorAndStatus_Matched(collectorEntity, true)
                 .stream()
-                .filter(garbage -> !garbage.getStatus().isStartCollection() && !garbage.getStatus().isCollectionCompleted())
+                .filter(garbage -> !garbage.getStatus().isCollectionCompleted())
                 .map(this::convertToGarbageInfoDTO)
                 .collect(java.util.stream.Collectors.toList());
     }
