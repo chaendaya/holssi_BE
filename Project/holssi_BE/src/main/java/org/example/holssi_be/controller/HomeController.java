@@ -30,6 +30,6 @@ public class HomeController {
         response.put("role", member.getRole());
         response.put("name", member.getName());
 
-        return new ResponseDTO(true, response);
+        return new ResponseDTO(true, response, null);
     }
 }

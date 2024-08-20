@@ -32,7 +32,7 @@ public class AdminController {
             adminService.createAdmin(adminDTO);
             return new ResponseDTO(true, "Admin created successfully", null);
         } catch (Exception e) {
-            return new ResponseDTO(false, e.getMessage());
+            return new ResponseDTO(false, null, e.getMessage());
         }
     }
 
@@ -42,6 +42,6 @@ public class AdminController {
 
         Member member = (Member) request.getAttribute("member");
         List<GarbageInfoDTO> allWaitingGarbages = adminGarbageService.getAllWaitingGarbages(member);
-        return new ResponseDTO(true, allWaitingGarbages);
+        return new ResponseDTO(true, allWaitingGarbages, null);
     }
 }

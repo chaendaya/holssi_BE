@@ -50,9 +50,9 @@ public class LoginController {
             response.put("token", token);
             response.put("role", member.getRole());
 
-            return ResponseEntity.ok(new ResponseDTO(true, response));
+            return ResponseEntity.ok(new ResponseDTO(true, response, null));
         } catch (Exception e) {
-            return ResponseEntity.ok(new ResponseDTO(false, "Invalid credentials"));
+            return ResponseEntity.ok(new ResponseDTO(false, null,"Invalid credentials"));
         }
     }
 
