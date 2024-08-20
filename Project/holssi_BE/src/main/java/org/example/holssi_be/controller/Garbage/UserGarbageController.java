@@ -3,9 +3,7 @@ package org.example.holssi_be.controller.Garbage;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.holssi_be.dto.Garbage.RegisterGarbageDTO;
-import org.example.holssi_be.dto.Garbage.RegisteredGarbageDTO;
-import org.example.holssi_be.dto.Garbage.RegisteredResponseDTO;
+import org.example.holssi_be.dto.Garbage.*;
 import org.example.holssi_be.dto.LocationDTO;
 import org.example.holssi_be.dto.RatingRequestDTO;
 import org.example.holssi_be.dto.ResponseDTO;
@@ -24,11 +22,11 @@ public class UserGarbageController {
     private final UserGarbageService userGarbageService;
 
     @PostMapping("/totalValue")
-    public ResponseDTO totalWeight(@RequestBody @Valid RegisterGarbageDTO registerGarbageDTO, BindingResult bindingResult) {
+    public ResponseDTO totalWeight(@RequestBody @Valid GarbageRegistrationDTO garbageRegistrationDTO, BindingResult bindingResult) {
         ValidationUtil.validateRequest(bindingResult);
 
-        double organicWeight = registerGarbageDTO.getOrganicWeight();
-        double non_organicWeight = registerGarbageDTO.getNon_organicWeight();
+        double organicWeight = garbageRegistrationDTO.getOrganicWeight();
+        double non_organicWeight = garbageRegistrationDTO.getNon_organicWeight();
         double totalValue = 60 * organicWeight + 80 * non_organicWeight;
 
         return new ResponseDTO(true, totalValue, null);
@@ -36,18 +34,18 @@ public class UserGarbageController {
 
     // 쓰레기 등록 - User
     @PostMapping("/register")
-    public ResponseDTO registerGarbage(@RequestBody @Valid RegisterGarbageDTO registerGarbageDTO, BindingResult bindingResult,
+    public ResponseDTO registerGarbage(@RequestBody @Valid GarbageRegistrationDTO garbageRegistrationDTO, BindingResult bindingResult,
                                        HttpServletRequest request) {
         ValidationUtil.validateRequest(bindingResult);
 
         Member member = (Member) request.getAttribute("member");
-        userGarbageService.registerGarbage(registerGarbageDTO, member);
+        userGarbageService.registerGarbage(garbageRegistrationDTO, member);
 
         return new ResponseDTO(true, "Garbage register completed", null);
     }
 
-    // 등록한 쓰레기 중 수거인 매칭된 쓰레기 리스트 조회 - User
-    @GetMapping("/registered/matched")
+    // 등록 쓰레기 전체 조회
+    @GetMapping("/registered")
     public ResponseDTO getRegisteredGarbages(@RequestParam(defaultValue = "1") int page, HttpServletRequest request) {
 
         // 페이지 번호를 0 기반으로 변환 (클라이언트의 1페이지 -> 내부 0페이지)
@@ -56,12 +54,30 @@ public class UserGarbageController {
         Member member = (Member) request.getAttribute("member");
         Page<RegisteredGarbageDTO> registeredGarbagesPage = userGarbageService.getRegisteredGarbages(member, zeroBasePage);
 
-        RegisteredResponseDTO registeredDTO = new RegisteredResponseDTO(
+        RegisteredGarbageResponseDTO dto = new RegisteredGarbageResponseDTO(
                 registeredGarbagesPage.getContent(),
                 registeredGarbagesPage.hasNext() ? page +1 : -1,
                 registeredGarbagesPage.isLast()
         );
-        return new ResponseDTO(true, registeredDTO, null);
+        return new ResponseDTO(true, dto, null);
+    }
+
+    // 등록한 쓰레기 중 수거인 매칭된 쓰레기 리스트 조회 - User
+    @GetMapping("/registered/matched")
+    public ResponseDTO getRegisteredAndMatchedGarbages(@RequestParam(defaultValue = "1") int page, HttpServletRequest request) {
+
+        // 페이지 번호를 0 기반으로 변환 (클라이언트의 1페이지 -> 내부 0페이지)
+        int zeroBasePage = page -1;
+
+        Member member = (Member) request.getAttribute("member");
+        Page<RegisteredAndMatchedGarbageDTO> registeredAndMatchedGarbagesPage = userGarbageService.getRegisteredAndMatchedGarbages(member, zeroBasePage);
+
+        RegisteredAndMatchedResponseDTO dto = new RegisteredAndMatchedResponseDTO(
+                registeredAndMatchedGarbagesPage.getContent(),
+                registeredAndMatchedGarbagesPage.hasNext() ? page +1 : -1,
+                registeredAndMatchedGarbagesPage.isLast()
+        );
+        return new ResponseDTO(true, dto, null);
     }
 
     // 개별 쓰레기 수거인 정보

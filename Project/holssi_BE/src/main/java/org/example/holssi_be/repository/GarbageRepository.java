@@ -14,6 +14,7 @@ public interface GarbageRepository extends JpaRepository<Garbage, Long> {
     List<Garbage> findByStatus_MatchedAndLocationContaining(boolean matched, String location);
     List<Garbage> findByCollectorAndStatus_Matched(Collectors collector, boolean matched);
     Page<Garbage> findByStatus_MatchedAndUserId(boolean matched, Long userId, Pageable pageable);
+    Page<Garbage> findByUserId(Long userId, Pageable pageable);
     List<Garbage> findByStatus_CollectionCompleted(boolean collectionCompleted);
     List<Garbage> findByStatus_Matched(boolean matched);
 }

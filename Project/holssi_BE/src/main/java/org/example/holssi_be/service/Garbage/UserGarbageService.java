@@ -1,7 +1,8 @@
 package org.example.holssi_be.service.Garbage;
 
 import lombok.RequiredArgsConstructor;
-import org.example.holssi_be.dto.Garbage.RegisterGarbageDTO;
+import org.example.holssi_be.dto.Garbage.GarbageRegistrationDTO;
+import org.example.holssi_be.dto.Garbage.RegisteredAndMatchedGarbageDTO;
 import org.example.holssi_be.dto.Garbage.RegisteredGarbageDTO;
 import org.example.holssi_be.dto.LocationDTO;
 import org.example.holssi_be.entity.domain.*;
@@ -29,17 +30,17 @@ public class UserGarbageService {
     private final CollectorLocationRepository collectorLocationRepository;
 
     // 쓰레기 등록 - User
-    public void registerGarbage(RegisterGarbageDTO registerGarbageDTO, Member member) {
+    public void registerGarbage(GarbageRegistrationDTO garbageRegistrationDTO, Member member) {
         if (member == null || !member.getRole().equals("user")) {
             throw new NotUserException();
         }
 
-        Garbage garbage = create(registerGarbageDTO, member);
+        Garbage garbage = create(garbageRegistrationDTO, member);
         garbageRepository.save(garbage);
     }
 
     // 쓰레기 등록 DTO -> Entity
-    private Garbage create(RegisterGarbageDTO dto, Member member) {
+    private Garbage create(GarbageRegistrationDTO dto, Member member) {
         if (member == null || !member.getRole().equals("user")) {
             throw new NotUserException();
         }
@@ -63,8 +64,43 @@ public class UserGarbageService {
         return garbage;
     }
 
-    // 등록한 쓰레기 중 수거인 매칭된 쓰레기 리스트 조회 - User
+    // 등록한 쓰레기 전체 조회
     public Page<RegisteredGarbageDTO> getRegisteredGarbages(Member user, int page) {
+        // 사용자 객체가 null 이거나 역할이 "user"가 아닌 경우 예외를 던짐
+        if (user == null || !user.getRole().equals("user")) {
+            throw new NotUserException();
+        }
+
+        // 사용자 ID가 null 인 경우 예외를 던짐
+        Long userId = user.getId();
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID is null");
+        }
+
+        // Pageable 객체 생성 : 요청한 페이지 번호와 페이지 크기 (5개씩)
+        Pageable pageable = PageRequest.of(page, 5);
+
+        // 데이터베이스에서 사용자 ID와 일치하는 쓰레기 정보를 페이징하여 조회
+        Page<Garbage> garbagePage = garbageRepository.findByUserId(userId, pageable);
+
+        // 조회된 Garbage 객체를 DTO로 변환하고, Page<RegisteredGarbageDTO>로 반환
+        return garbagePage.map(this::convertToRegisteredGarbageDTO);
+    }
+
+    private RegisteredGarbageDTO convertToRegisteredGarbageDTO(Garbage garbage) {
+        RegisteredGarbageDTO dto = new RegisteredGarbageDTO();
+        dto.setGarbageId(garbage.getId());
+        dto.setMatched(garbage.getStatus().isMatched());
+        dto.setOrganicWeight(garbage.getOrganicWeight());
+        dto.setNon_organicWeight(garbage.getNon_organicWeight());
+        dto.setSaving(garbage.getTotalValue());
+        dto.setRegistrationDate(garbage.getRegistrationDate());
+
+        return dto;
+    }
+
+    // 등록한 쓰레기 중 수거인 매칭된 쓰레기 리스트 조회 - User
+    public Page<RegisteredAndMatchedGarbageDTO> getRegisteredAndMatchedGarbages(Member user, int page) {
         // 사용자 객체가 null 이거나 역할이 "user"가 아닌 경우 예외를 던짐
         if (user == null || !user.getRole().equals("user")) {
             throw new NotUserException();
@@ -83,11 +119,11 @@ public class UserGarbageService {
         Page<Garbage> garbagePage = garbageRepository.findByStatus_MatchedAndUserId(true, userId, pageable);
 
         // 조회된 Garbage 객체를 DTO로 변환하고, Page<RegisteredGarbageDTO>로 반환
-        return garbagePage.map(this::convertToRegisteredGarbageDTO);
+        return garbagePage.map(this::convertToRegisteredAndMatchedGarbageDTO);
     }
 
-    private RegisteredGarbageDTO convertToRegisteredGarbageDTO(Garbage garbage) {
-        RegisteredGarbageDTO dto = new RegisteredGarbageDTO();
+    private RegisteredAndMatchedGarbageDTO convertToRegisteredAndMatchedGarbageDTO(Garbage garbage) {
+        RegisteredAndMatchedGarbageDTO dto = new RegisteredAndMatchedGarbageDTO();
         dto.setGarbageId(garbage.getId());
         dto.setMatched(garbage.getStatus().isMatched());
         dto.setCollectorName(garbage.getCollector().getMember().getName());

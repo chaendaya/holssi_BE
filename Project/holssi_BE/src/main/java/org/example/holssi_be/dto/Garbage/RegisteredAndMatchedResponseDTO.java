@@ -8,8 +8,8 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class RegisteredResponseDTO {
-    private List<RegisteredGarbageDTO> data;
+public class RegisteredAndMatchedResponseDTO {
+    private List<RegisteredAndMatchedGarbageDTO> data;
     private int nextPage;
 
     @JsonProperty("isLast")
