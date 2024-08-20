@@ -31,7 +31,7 @@ public class UserGarbageController {
         double non_organicWeight = registerGarbageDTO.getNon_organicWeight();
         double totalValue = 60 * organicWeight + 80 * non_organicWeight;
 
-        return new ResponseDTO(true, totalValue);
+        return new ResponseDTO(true, totalValue, null);
     }
 
     // 쓰레기 등록 - User
@@ -47,7 +47,7 @@ public class UserGarbageController {
     }
 
     // 등록한 쓰레기 중 수거인 매칭된 쓰레기 리스트 조회 - User
-    @GetMapping("/registered")
+    @GetMapping("/registered/matched")
     public ResponseDTO getRegisteredGarbages(@RequestParam(defaultValue = "1") int page, HttpServletRequest request) {
 
         // 페이지 번호를 0 기반으로 변환 (클라이언트의 1페이지 -> 내부 0페이지)
@@ -61,7 +61,7 @@ public class UserGarbageController {
                 registeredGarbagesPage.hasNext() ? page +1 : -1,
                 registeredGarbagesPage.isLast()
         );
-        return new ResponseDTO(true, registeredDTO);
+        return new ResponseDTO(true, registeredDTO, null);
     }
 
     // 개별 쓰레기 수거인 정보
@@ -71,7 +71,7 @@ public class UserGarbageController {
         Member member = (Member) request.getAttribute("member");
         String collectorName = userGarbageService.getCollectorInfo(garbageId, member);
 
-        return new ResponseDTO(true, collectorName);
+        return new ResponseDTO(true, collectorName, null);
     }
 
     // 개별 쓰레기 수거인 실시간 위치
@@ -81,7 +81,7 @@ public class UserGarbageController {
         Member member = (Member) request.getAttribute("member");
         LocationDTO location = userGarbageService.getLocation(garbageId, member);
 
-        return new ResponseDTO(true, location);
+        return new ResponseDTO(true, location, null);
     }
 
     // 개별 쓰레기 수거인 평가

@@ -34,7 +34,7 @@ public class AuthController {
         Map<String, String> userData = AuthUtil.createTemporaryUser(userDTO);
         authService.saveTemporaryUser(userDTO.getEmail(), userData);
 
-        return new ResponseDTO(true, null);
+        return new ResponseDTO(true, null,null);
     }
 
     @PostMapping("/collector")
@@ -44,7 +44,7 @@ public class AuthController {
         Map<String, String> collectorData = AuthUtil.createTemporaryCollector(collectorDTO);
         authService.saveTemporaryCollector(collectorDTO.getEmail(), collectorData);
 
-        return new ResponseDTO(true, null);
+        return new ResponseDTO(true, null, null);
     }
 
     @PostMapping("/checkEmail")

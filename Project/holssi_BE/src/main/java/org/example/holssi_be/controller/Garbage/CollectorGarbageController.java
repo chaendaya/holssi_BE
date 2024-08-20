@@ -31,7 +31,7 @@ public class CollectorGarbageController {
         Member member = (Member) request.getAttribute("member");
         List<GarbageInfoDTO> waitingGarbages = collectorGarbageService.getWaitingGarbages(member);
 
-        return new ResponseDTO(true, waitingGarbages);
+        return new ResponseDTO(true, waitingGarbages, null);
     }
 
     // 수거할 날짜 등록 및 매칭 완료 - Collector
@@ -53,7 +53,7 @@ public class CollectorGarbageController {
         Member member = (Member) request.getAttribute("member");
         List<GarbageInfoDTO> acceptedGarbages = collectorGarbageService.getAcceptedGarbages(member);
 
-        return new ResponseDTO(true, acceptedGarbages);
+        return new ResponseDTO(true, acceptedGarbages, null);
     }
 
     // 개별 쓰레기 정보 조회 - Collector
@@ -63,7 +63,7 @@ public class CollectorGarbageController {
         Member member = (Member) request.getAttribute("member");
         GarbageDetailsDTO garbageDetails = collectorGarbageService.getGarbageDetails(garbageId, member);
 
-        return new ResponseDTO(true, garbageDetails);
+        return new ResponseDTO(true, garbageDetails, null);
     }
 
     // 개별 쓰레기 수거 시작 - Collector
@@ -73,7 +73,7 @@ public class CollectorGarbageController {
         Member member = (Member) request.getAttribute("member");
         GarbageLocationDTO locationDTO = collectorGarbageService.startCollection(garbageId, member);
 
-        return new ResponseDTO(true, locationDTO);
+        return new ResponseDTO(true, locationDTO, null);
     }
 
     // 개별 쓰레기 수거 완료

@@ -23,6 +23,6 @@ public class UserController {
         Member member = (Member) request.getAttribute("member");
         double totalRp = userGarbageService.getTotalRp(member);
 
-        return new ResponseDTO(true, totalRp);
+        return new ResponseDTO(true, totalRp, null);
     }
 }
