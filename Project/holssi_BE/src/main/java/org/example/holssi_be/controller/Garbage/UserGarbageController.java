@@ -91,7 +91,7 @@ public class UserGarbageController {
     }
 
     // 개별 쓰레기 수거인 실시간 위치
-    @GetMapping("/{garbage-id}/location")
+    @GetMapping("/{garbage-id}/collectorLocation")
     public ResponseDTO getLocation(@PathVariable("garbage-id") Long garbageId, HttpServletRequest request) {
 
         Member member = (Member) request.getAttribute("member");

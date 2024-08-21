@@ -66,6 +66,17 @@ public class CollectorGarbageController {
         return new ResponseDTO(true, garbageDetails, null);
     }
 
+    // 개별 쓰레기 위치 조회
+    @GetMapping("/{garbage-id}/garbageLocation")
+    public ResponseDTO getGarbageLocation(@PathVariable("garbage-id") Long garbageId, HttpServletRequest request) {
+
+        Member member = (Member) request.getAttribute("member");
+        GarbageLocationDTO locationDTO = collectorGarbageService.getGarbageLocation(garbageId, member);
+
+        return new ResponseDTO(true, locationDTO, null);
+    }
+
+
     // 개별 쓰레기 수거 시작 - Collector
     @PostMapping("/accept/{garbage-id}/start")
     public ResponseDTO startCollection(@PathVariable("garbage-id") Long garbageId, HttpServletRequest request) {
