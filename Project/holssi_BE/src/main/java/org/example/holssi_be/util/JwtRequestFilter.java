@@ -40,7 +40,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             "/api/admin/create",
             "/h2-console",
             "/h2-console/.*",
-            "/api/temp/.*"
+            "/api/temp/.*",
+            "/api/refresh-token"
     );
 
     @Override
