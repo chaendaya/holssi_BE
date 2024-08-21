@@ -77,7 +77,7 @@ public class CollectorGarbageService {
 
         return garbageRepository.findByCollectorAndStatus_Matched(collectorEntity, true)
                 .stream()
-                .filter(garbage -> !garbage.getStatus().isCollectionCompleted())
+                .filter(garbage -> !garbage.getStatus().isStartCollection() && !garbage.getStatus().isCollectionCompleted())
                 .map(this::convertToGarbageInfoDTO)
                 .collect(java.util.stream.Collectors.toList());
     }
