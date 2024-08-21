@@ -51,4 +51,23 @@ public class JwtTokenUtil {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
+    // 리프레시 토큰 생성
+    public String createRefreshToken(UserDetails userDetails) {
+        return Jwts.builder()
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + refreshExpiration * 1000))
+                .signWith(SignatureAlgorithm.HS512, secret)
+                .compact();
+    }
+
+    // 리프레시 토큰 만료 시간
+    @Value("${jwt.refreshExpiration}")
+    private Long refreshExpiration;
+
+    public Long getRefreshTokenExpirationSeconds() {
+        return refreshExpiration;
+    }
+
 }

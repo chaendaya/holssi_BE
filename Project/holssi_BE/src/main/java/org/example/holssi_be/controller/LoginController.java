@@ -1,5 +1,8 @@
 package org.example.holssi_be.controller;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.holssi_be.dto.LoginDTO;
@@ -8,6 +11,8 @@ import org.example.holssi_be.entity.domain.Member;
 import org.example.holssi_be.repository.MemberRepository;
 import org.example.holssi_be.service.CustomUserDetailsService;
 import org.example.holssi_be.util.JwtTokenUtil;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,14 +30,14 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class LoginController {
 
-    private final AuthenticationManager  authenticationManager;
+    private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
     private final CustomUserDetailsService userDetailsService;
     private final MemberRepository memberRepository;
 
     @PostMapping("/login")
-    public ResponseEntity<ResponseDTO> createAuthToken(@RequestBody @Valid LoginDTO loginDTO) {
-        try{
+    public ResponseEntity<ResponseDTO> createAuthToken(@RequestBody @Valid LoginDTO loginDTO,  HttpServletResponse response) {
+        try {
             // Member 인증
             authenticate(loginDTO.getEmail(), loginDTO.getPassword());
 
@@ -42,17 +47,28 @@ public class LoginController {
             // Member 정보 조회
             Member member = memberRepository.findByEmail(loginDTO.getEmail()).get();
 
-            // JWT 토큰 생성
-            final String token = jwtTokenUtil.createToken(userDetails);
+            // JWT 액세스 토큰 및 리프레시 토큰 생성
+            final String accessToken = jwtTokenUtil.createToken(userDetails);
+            final String refreshToken = jwtTokenUtil.createRefreshToken(userDetails);
 
-            // 응답 구성
-            Map<String, Object> response = new HashMap<>();
-            response.put("token", token);
-            response.put("role", member.getRole());
+            // 응답 헤더에 액세스 토큰 추가
+            response.setHeader("Authorization", "Bearer " + accessToken);
 
-            return ResponseEntity.ok(new ResponseDTO(true, response, null));
+            // 리프레시 토큰을 쿠키에 추가
+            Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+            refreshTokenCookie.setHttpOnly(true); // JavaScript에서 접근 불가
+            // refreshTokenCookie.setSecure(true); // HTTPS 에서만 전송
+            refreshTokenCookie.setPath("/"); // 쿠키의 경로 설정
+            refreshTokenCookie.setMaxAge(Math.toIntExact(jwtTokenUtil.getRefreshTokenExpirationSeconds()));
+            response.addCookie(refreshTokenCookie);
+
+            // 응답 바디 구성
+            Map<String, Object> responseBody = new HashMap<>();
+            responseBody.put("role", member.getRole());
+
+            return ResponseEntity.ok(new ResponseDTO(true, responseBody, null));
         } catch (Exception e) {
-            return ResponseEntity.ok(new ResponseDTO(false, null,"Invalid credentials"));
+            return ResponseEntity.ok(new ResponseDTO(false, null, "Invalid credentials"));
         }
     }
 
@@ -62,4 +78,43 @@ public class LoginController {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
     }
 
+    @PostMapping("/refresh-token")
+    public ResponseEntity<ResponseDTO> refreshAuthToken(HttpServletRequest request) {
+        try {
+            // 쿠키에서 리프레시 토큰 추출
+            Cookie[] cookies = request.getCookies();
+            String refreshToken = null;
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if ("refreshToken".equals(cookie.getName())) {
+                        refreshToken = cookie.getValue();
+                        break;
+                    }
+                }
+            }
+
+            if (refreshToken == null) {
+                throw new IllegalArgumentException("Refresh token is missing");
+            }
+
+            // 리프레시 토큰 검증 및 사용자 정보 로드
+            String username = jwtTokenUtil.getUsernameFromToken(refreshToken);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+            if (jwtTokenUtil.validateToken(refreshToken, userDetails)) {
+                // 새 액세스 토큰 생성
+                final String newAccessToken = jwtTokenUtil.createToken(userDetails);
+
+                // 새 액세스 토큰을 응답 헤더에 추가
+                HttpHeaders headers = new HttpHeaders();
+                headers.set("Authorization", "Bearer " + newAccessToken);
+
+                return ResponseEntity.ok().headers(headers).body(new ResponseDTO(true, "Access token refreshed", null));
+            } else {
+                throw new IllegalArgumentException("Refresh token is invalid");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO(false, null, e.getMessage()));
+        }
+    }
 }

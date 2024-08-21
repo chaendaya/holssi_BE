@@ -36,7 +36,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))  // CORS 설정 추가
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/index.html", "/favicon.ico",
-                                "/api/auth/**", "/api/login", "/api/admin/create", "/h2-console", "/h2-console/**", "/api/temp/**").permitAll()
+                                "/api/auth/**", "/api/login", "/api/admin/create", "/h2-console", "/h2-console/**", "/api/temp/**", "/api/refresh-token").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
