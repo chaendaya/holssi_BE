@@ -149,6 +149,25 @@ public class CollectorGarbageService {
         return "매칭 안됨";
     }
 
+    // 개별 쓰레기 위치 조회
+    public GarbageLocationDTO getGarbageLocation(Long garbageId, Member collector) {
+        Garbage garbage = garbageRepository.findById(garbageId)
+                .orElseThrow(() -> new ResourceNotFoundException("Garbage not found with ID: " + garbageId));
+
+        if (collector == null || !collector.getRole().equals("collector")) {
+            throw new NotCollectorException();
+        }
+
+        GarbageLocationDTO dto = new GarbageLocationDTO();
+        dto.setGarbageId(garbage.getId());
+        dto.setLocation(garbage.getLocation());
+
+        double[] coordinates = geocodingUtil.getCoordinates(garbage.getLocation());
+        dto.setLatitude(coordinates[0]);
+        dto.setLongitude(coordinates[1]);
+
+        return dto;
+    }
 
     // 개별 쓰레기 수거 시작
     public GarbageLocationDTO startCollection(Long garbageId, Member collector) {
