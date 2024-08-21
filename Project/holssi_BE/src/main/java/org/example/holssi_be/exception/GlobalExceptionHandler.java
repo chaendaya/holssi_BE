@@ -63,8 +63,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ResponseDTO> handleIllegalArgumentException(IllegalArgumentException ex) {
+    @ExceptionHandler(IllegalException.class)
+    public ResponseEntity<ResponseDTO> handleIllegalArgumentException(IllegalException ex) {
         ResponseDTO responseDTO = new ResponseDTO(false, ex.getMessage());
         return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
     }

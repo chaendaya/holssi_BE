@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.holssi_be.dto.LoginDTO;
 import org.example.holssi_be.dto.ResponseDTO;
 import org.example.holssi_be.entity.domain.Member;
+import org.example.holssi_be.exception.IllegalException;
 import org.example.holssi_be.repository.MemberRepository;
 import org.example.holssi_be.service.CustomUserDetailsService;
 import org.example.holssi_be.util.JwtTokenUtil;
@@ -95,13 +96,13 @@ public class LoginController {
             }
 
             if (refreshToken == null) {
-                throw new IllegalArgumentException("Refresh token is missing");
+                throw new IllegalException("Refresh token is missing");
             }
 
             // 헤더에서 만료된 액세스 토큰 추출
             String expiredAccessToken = request.getHeader("Authorization");
             if (expiredAccessToken == null || !expiredAccessToken.startsWith("Bearer ")) {
-                throw new IllegalArgumentException("Invalid access token format");
+                throw new IllegalException("Invalid access token format");
             }
             expiredAccessToken = expiredAccessToken.substring(7); // "Bearer " 제거
 
@@ -126,7 +127,7 @@ public class LoginController {
 
                 return ResponseEntity.ok().headers(headers).body(new ResponseDTO(true, "Access token refreshed", null));
             } else {
-                throw new IllegalArgumentException("Refresh token is invalid");
+                throw new IllegalException("Refresh token is invalid");
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO(false, null, e.getMessage()));
