@@ -33,7 +33,8 @@ public class JwtAuthEntryPoint implements AuthenticationEntryPoint, AccessDenied
             "/api/admin/create",
             "/h2-console",
             "/h2-console/.*",
-            "/api/temp/.*"
+            "/api/temp/.*",
+            "/api/refresh-token"
     );
 
     @Override
