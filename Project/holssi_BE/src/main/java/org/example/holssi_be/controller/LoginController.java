@@ -1,5 +1,6 @@
 package org.example.holssi_be.controller;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -97,10 +98,24 @@ public class LoginController {
                 throw new IllegalArgumentException("Refresh token is missing");
             }
 
-            // 리프레시 토큰 검증 및 사용자 정보 로드
-            String username = jwtTokenUtil.getUsernameFromToken(refreshToken);
+            // 헤더에서 만료된 액세스 토큰 추출
+            String expiredAccessToken = request.getHeader("Authorization");
+            if (expiredAccessToken == null || !expiredAccessToken.startsWith("Bearer ")) {
+                throw new IllegalArgumentException("Invalid access token format");
+            }
+            expiredAccessToken = expiredAccessToken.substring(7); // "Bearer " 제거
+
+            // 만료된 토큰에서 사용자 정보 추출 (예외 발생하지 않도록 처리)
+            String username;
+            try {
+                username = jwtTokenUtil.getUsernameFromToken(expiredAccessToken);
+            } catch (ExpiredJwtException e) {
+                username = e.getClaims().getSubject(); // 만료된 토큰에서도 subject (username) 추출 가능
+            }
+
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
+            // 리프레시 토큰 검증
             if (jwtTokenUtil.validateToken(refreshToken, userDetails)) {
                 // 새 액세스 토큰 생성
                 final String newAccessToken = jwtTokenUtil.createToken(userDetails);
