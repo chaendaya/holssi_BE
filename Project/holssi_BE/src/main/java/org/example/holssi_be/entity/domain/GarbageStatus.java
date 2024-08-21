@@ -25,6 +25,10 @@ public class GarbageStatus {
     @Temporal(TemporalType.TIMESTAMP)
     private Date collectionDate;
 
+    @ManyToOne
+    @JoinColumn(name = "collector_id", nullable = true) // null 허용
+    private Collectors collector; // 새로운 필드 추가
+
     @PrePersist
     protected void onCreate() {
         matched = false;

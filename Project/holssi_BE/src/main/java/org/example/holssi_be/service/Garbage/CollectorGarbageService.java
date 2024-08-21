@@ -9,6 +9,7 @@ import org.example.holssi_be.exception.NotCollectorException;
 import org.example.holssi_be.exception.ResourceNotFoundException;
 import org.example.holssi_be.repository.CollectorLocationRepository;
 import org.example.holssi_be.repository.GarbageRepository;
+import org.example.holssi_be.repository.GarbageStatusRepository;
 import org.example.holssi_be.util.GeocodingUtil;
 import org.springframework.stereotype.Service;
 
@@ -22,9 +23,10 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class CollectorGarbageService {
 
-    private final GarbageRepository garbageRepository;
     private final GeocodingUtil geocodingUtil;
+    private final GarbageRepository garbageRepository;
     private final CollectorLocationRepository collectorLocationRepository;
+    private final GarbageStatusRepository garbageStatusRepository;
 
     // 매칭 대기 중인 쓰레기 리스트 조회 - Collector
     public List<GarbageInfoDTO> getWaitingGarbages(Member collector) {
@@ -63,6 +65,7 @@ public class CollectorGarbageService {
         status.setCollectionDate(acceptGarbageDTO.getCollectionDate());
         status.setMatched(true);
         status.setStartCollection(false);
+        status.setCollector(collectorEntity);
 
         garbageRepository.save(garbage);
     }
@@ -253,5 +256,28 @@ public class CollectorGarbageService {
         location.setTimestamp(LocalDateTime.now());
 
         collectorLocationRepository.save(location);
+    }
+
+    // 수거관이 수거 중인 쓰레기 Id 반환
+    public List<CollectingGarbageDTO> getCollectingGarbageId(Member collector) {
+        if (collector == null || !collector.getRole().equals("collector")) {
+            throw new NotCollectorException();
+        }
+
+        Long collectorId = collector.getId();
+        // GarbageStatus 객체 리스트를 조회합니다.
+        List<GarbageStatus> garbageStatuses = garbageStatusRepository.findByCollectorIdAndStartCollection(collectorId, true);
+
+        // GarbageStatus 리스트에서 Garbage ID를 추출하여 리스트로 반환합니다.
+        List<CollectingGarbageDTO> collectingGarbageDTOs = garbageStatuses.stream()
+                .map(garbageStatus -> {
+                    CollectingGarbageDTO dto = new CollectingGarbageDTO();
+                    dto.setGarbageId(garbageStatus.getGarbage().getId());
+                    dto.setStarted(garbageStatus.isStartCollection()); // Ensure this matches your method for started status
+                    return dto;
+                })
+                .collect(java.util.stream.Collectors.toList());
+
+        return collectingGarbageDTOs;
     }
 }

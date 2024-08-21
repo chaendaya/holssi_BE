@@ -38,7 +38,6 @@ public class Garbage {
     @OneToOne(mappedBy = "garbage", cascade = CascadeType.ALL)
     private CollectorLocation collectorLocation;
 
-
     @OneToOne(mappedBy = "garbage", cascade = CascadeType.ALL)
     private GarbageStatus status;
 
