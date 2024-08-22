@@ -56,13 +56,19 @@ public class LoginController {
             // 응답 헤더에 액세스 토큰 추가
             response.setHeader("Authorization", "Bearer " + accessToken);
 
-            // 리프레시 토큰을 쿠키에 추가
+            /*// 리프레시 토큰을 쿠키에 추가
             Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
             refreshTokenCookie.setHttpOnly(true); // JavaScript에서 접근 불가
             // refreshTokenCookie.setSecure(true); // HTTPS 에서만 전송
             refreshTokenCookie.setPath("/"); // 쿠키의 경로 설정
             refreshTokenCookie.setMaxAge(Math.toIntExact(jwtTokenUtil.getRefreshTokenExpirationSeconds()));
-            response.addCookie(refreshTokenCookie);
+            */
+
+            // 리프레시 토큰을 쿠키에 추가 (SameSite=None)
+            String setCookieHeader = String.format("refreshToken=%s; Max-Age=%d; Path=/; HttpOnly; SameSite=None",
+                    refreshToken,
+                    Math.toIntExact(jwtTokenUtil.getRefreshTokenExpirationSeconds()));
+            response.addHeader("Set-Cookie", setCookieHeader);
 
             // 응답 바디 구성
             Map<String, Object> responseBody = new HashMap<>();
