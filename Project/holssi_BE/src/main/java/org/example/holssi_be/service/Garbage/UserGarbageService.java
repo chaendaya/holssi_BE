@@ -6,12 +6,14 @@ import org.example.holssi_be.dto.Garbage.RegisteredAndMatchedGarbageDTO;
 import org.example.holssi_be.dto.Garbage.RegisteredGarbageDTO;
 import org.example.holssi_be.dto.LocationDTO;
 import org.example.holssi_be.entity.domain.*;
+import org.example.holssi_be.exception.IllegalException;
 import org.example.holssi_be.exception.NotUserException;
 import org.example.holssi_be.exception.ResourceNotFoundException;
 import org.example.holssi_be.repository.CollectorLocationRepository;
 import org.example.holssi_be.repository.GarbageRepository;
 import org.example.holssi_be.repository.RatingRepository;
 import org.example.holssi_be.repository.UserRepository;
+import org.example.holssi_be.service.GarbageValueService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +30,7 @@ public class UserGarbageService {
     private final UserRepository userRepository;
     private final RatingRepository ratingRepository;
     private final CollectorLocationRepository collectorLocationRepository;
+    private final GarbageValueService garbageValueService;
 
     // 쓰레기 등록 - User
     public void registerGarbage(GarbageRegistrationDTO garbageRegistrationDTO, Member member) {
@@ -47,12 +50,18 @@ public class UserGarbageService {
 
         double organicWeight = dto.getOrganicWeight();
         double non_organicWeight = dto.getNon_organicWeight();
-        double totalValue = 60 * organicWeight + 80 * non_organicWeight;
+
+        double organicValue = garbageValueService.getValue().getOrganic();
+        double non_organicValue = garbageValueService.getValue().getNon_organic();
+
+        double totalValue = organicValue * organicWeight + non_organicValue * non_organicWeight;
 
         Garbage garbage = new Garbage();
         garbage.setUser(member.getUser());
         garbage.setOrganicWeight(organicWeight);
         garbage.setNon_organicWeight(non_organicWeight);
+        garbage.setOrganicValue(organicValue);
+        garbage.setNon_organicValue(non_organicValue);
         garbage.setTotalWeight(organicWeight + non_organicWeight);
         garbage.setTotalValue(totalValue);
         garbage.setLocation(member.getUser().getLocation());
@@ -74,7 +83,7 @@ public class UserGarbageService {
         // 사용자 ID가 null 인 경우 예외를 던짐
         Long userId = user.getId();
         if (userId == null) {
-            throw new IllegalArgumentException("User ID is null");
+            throw new IllegalException("User ID is null");
         }
 
         // Pageable 객체 생성 : 요청한 페이지 번호와 페이지 크기 (5개씩)
@@ -169,7 +178,7 @@ public class UserGarbageService {
             } else if (!status.isStartCollection() && !status.isCollectionCompleted()) {
                 return "수거 시작 전";
             } else if (status.isStartCollection() && status.isCollectionCompleted()) {
-                throw new IllegalStateException("수거 상태 에러: 수거 시작과 완료가 동시에 참일 수 없습니다.");
+                throw new IllegalException("수거 상태 에러: 수거 시작과 완료가 동시에 참일 수 없습니다.");
             }
         }
         return "매칭 안됨";
@@ -185,7 +194,7 @@ public class UserGarbageService {
         // 사용자 ID가 null 인 경우 예외를 던짐
         Long userId = user.getId();
         if (userId == null) {
-            throw new IllegalArgumentException("User ID is null");
+            throw new IllegalException("User ID is null");
         }
 
         // 사용자 ID로 데이터베이스에서 사용자를 조회, 없으면 예외를 던짐
@@ -246,7 +255,7 @@ public class UserGarbageService {
         // 사용자 ID가 null 인 경우 예외를 던짐
         Long userId = user.getId();
         if (userId == null) {
-            throw new IllegalArgumentException("User ID is null");
+            throw new IllegalException("User ID is null");
         }
 
         Rating rating = garbage.getRating();

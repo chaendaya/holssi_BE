@@ -9,6 +9,7 @@ import org.example.holssi_be.dto.RatingRequestDTO;
 import org.example.holssi_be.dto.ResponseDTO;
 import org.example.holssi_be.entity.domain.Member;
 import org.example.holssi_be.service.Garbage.UserGarbageService;
+import org.example.holssi_be.service.GarbageValueService;
 import org.example.holssi_be.util.ValidationUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.validation.BindingResult;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserGarbageController {
 
     private final UserGarbageService userGarbageService;
+    private final GarbageValueService garbageValueService;
 
     @PostMapping("/totalValue")
     public ResponseDTO totalWeight(@RequestBody @Valid GarbageRegistrationDTO garbageRegistrationDTO, BindingResult bindingResult) {
@@ -27,7 +29,11 @@ public class UserGarbageController {
 
         double organicWeight = garbageRegistrationDTO.getOrganicWeight();
         double non_organicWeight = garbageRegistrationDTO.getNon_organicWeight();
-        double totalValue = 60 * organicWeight + 80 * non_organicWeight;
+
+        double organicValue = garbageValueService.getValue().getOrganic();
+        double non_organicValue = garbageValueService.getValue().getNon_organic();
+
+        double totalValue = organicValue * organicWeight + non_organicValue * non_organicWeight;
 
         return new ResponseDTO(true, totalValue, null);
     }

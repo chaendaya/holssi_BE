@@ -85,18 +85,6 @@ public class CollectorGarbageService {
                 .collect(java.util.stream.Collectors.toList());
     }
 
-    // 개별 쓰레기 정보 조회
-    public GarbageDetailsDTO getGarbageDetails(Long garbageId, Member collector) {
-        Garbage garbage = garbageRepository.findById(garbageId)
-                .orElseThrow(() -> new ResourceNotFoundException("Garbage not found with ID: " + garbageId));
-
-        if (collector == null || !collector.getRole().equals("collector")) {
-            throw new NotCollectorException();
-        }
-
-        return convertToGarbageDetailsDTO(garbage);
-    }
-
     private GarbageInfoDTO convertToGarbageInfoDTO(Garbage garbage) {
         GarbageInfoDTO dto = new GarbageInfoDTO();
         dto.setGarbageId(garbage.getId());
@@ -116,14 +104,26 @@ public class CollectorGarbageService {
         return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
     }
 
+    // 개별 쓰레기 정보 조회
+    public GarbageDetailsDTO getGarbageDetails(Long garbageId, Member collector) {
+        Garbage garbage = garbageRepository.findById(garbageId)
+                .orElseThrow(() -> new ResourceNotFoundException("Garbage not found with ID: " + garbageId));
+
+        if (collector == null || !collector.getRole().equals("collector")) {
+            throw new NotCollectorException();
+        }
+
+        return convertToGarbageDetailsDTO(garbage);
+    }
+
     private GarbageDetailsDTO convertToGarbageDetailsDTO(Garbage garbage) {
         ComponentDTO organic = new ComponentDTO();
         ComponentDTO non_organic = new ComponentDTO();
 
-        organic.setRP(garbage.getOrganicWeight() * 60);
+        organic.setRP(garbage.getOrganicValue());
         organic.setBreat(garbage.getOrganicWeight());
 
-        non_organic.setRP(garbage.getNon_organicWeight() * 80);
+        non_organic.setRP(garbage.getNon_organicValue());
         non_organic.setBreat(garbage.getNon_organicWeight());
 
         GarbageDetailsDTO dto = new GarbageDetailsDTO();
