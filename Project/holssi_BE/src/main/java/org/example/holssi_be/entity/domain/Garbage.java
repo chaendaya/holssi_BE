@@ -21,6 +21,10 @@ public class Garbage {
 
     private Double organicWeight;
     private Double non_organicWeight;
+
+    private Double organicValue;
+    private Double non_organicValue;
+
     private Double totalWeight;
     private Double totalValue;
 
