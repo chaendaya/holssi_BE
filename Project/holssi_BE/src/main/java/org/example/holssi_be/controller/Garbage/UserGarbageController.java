@@ -7,6 +7,7 @@ import org.example.holssi_be.dto.Garbage.*;
 import org.example.holssi_be.dto.LocationDTO;
 import org.example.holssi_be.dto.RatingRequestDTO;
 import org.example.holssi_be.dto.ResponseDTO;
+import org.example.holssi_be.entity.domain.GarbageValue;
 import org.example.holssi_be.entity.domain.Member;
 import org.example.holssi_be.service.Garbage.UserGarbageService;
 import org.example.holssi_be.service.GarbageValueService;
@@ -22,6 +23,20 @@ public class UserGarbageController {
 
     private final UserGarbageService userGarbageService;
     private final GarbageValueService garbageValueService;
+
+    @GetMapping("/getValue")
+    public ResponseDTO getValue() {
+
+        GarbageValue garbageValue = garbageValueService.getValue();
+        double organicValue = garbageValue.getOrganic();
+        double non_organicValue = garbageValue.getNon_organic();
+
+        GarbageValueDTO dto = new GarbageValueDTO();
+        dto.setOrganicValue(organicValue);
+        dto.setNon_organicValue(non_organicValue);
+
+        return new ResponseDTO(true, dto, null);
+    }
 
     @PostMapping("/totalValue")
     public ResponseDTO totalWeight(@RequestBody @Valid GarbageRegistrationDTO garbageRegistrationDTO, BindingResult bindingResult) {

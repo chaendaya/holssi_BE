@@ -2,8 +2,8 @@ package org.example.holssi_be.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.holssi_be.dto.Garbage.GarbageValueDTO;
-import org.example.holssi_be.entity.domain.Member;
 import org.example.holssi_be.entity.domain.GarbageValue;
+import org.example.holssi_be.entity.domain.Member;
 import org.example.holssi_be.exception.IllegalException;
 import org.example.holssi_be.exception.NotAdminException;
 import org.example.holssi_be.repository.GarbageValueRepository;
@@ -16,6 +16,7 @@ public class GarbageValueService {
     private final GarbageValueRepository garbageValueRepository;
 
     public GarbageValue getValue() {
+
         return garbageValueRepository.findById(1L)
                 .orElseGet(() -> {
                     // Handle case when no row with id=1 is found
