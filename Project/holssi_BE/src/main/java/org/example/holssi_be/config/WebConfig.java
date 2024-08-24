@@ -20,6 +20,6 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(authTokenInterceptor)
                 .addPathPatterns("/api/garbages/**", "/api/home", "/api/user/**", "/api/collector/garbageId", "/api/admin/status", "/api/admin/updateValue") // 요청을 보낸 사용자의 member 속성이 필요한 경로
                 .excludePathPatterns("/", "/api/auth/**", "/api/login", "/api/admin/create", "/h2-console",
-                        "/h2-console/**", "/api/temp/**", "/api/refresh-token"); // 요청을 보낸 사용자의 member 속성이 필요 없는 경로
+                        "/h2-console/**", "/api/temp/**", "/api/refresh-token", "/api/garbages/getValue"); // 요청을 보낸 사용자의 member 속성이 필요 없는 경로
     }
 }
