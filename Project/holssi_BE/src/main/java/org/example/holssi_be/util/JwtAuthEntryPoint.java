@@ -23,6 +23,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtAuthEntryPoint implements AuthenticationEntryPoint, AccessDeniedHandler {
 
+    // JwtAuthEntryPoint : 인증이 실패했거나 권한이 없는 사용자가 요청했을 때의 진입점을 처리
+
     private final ObjectMapper objectMapper;
     private static final List<String> EXCLUDED_PATHS = List.of(
             "/",
@@ -34,15 +36,17 @@ public class JwtAuthEntryPoint implements AuthenticationEntryPoint, AccessDenied
             "/h2-console",
             "/h2-console/.*",
             "/api/temp/.*",
-            "/api/refresh-token",
             "/api/garbages/getValue"
     );
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
-        String requestURI = request.getRequestURI();
+
+        // commence : 요청이 JWT 인증을 요구하지만, 인증이 실패한 경우.
+
         // JWT 필터를 적용하지 않을 경로 확인
+        String requestURI = request.getRequestURI();
         if (shouldExclude(requestURI)) {
             return;
         }
@@ -77,11 +81,14 @@ public class JwtAuthEntryPoint implements AuthenticationEntryPoint, AccessDenied
     public void handle(HttpServletRequest request, HttpServletResponse response,
                        AccessDeniedException accessDeniedException) throws IOException {
 
-        String requestURI = request.getRequestURI();
+        // 인증된 사용자가 권한이 없는 리소스에 접근할 때 발생
+
         // JWT 필터를 적용하지 않을 경로 확인
+        String requestURI = request.getRequestURI();
         if (shouldExclude(requestURI)) {
             return;
         }
+
         ResponseDTO responseDTO = new ResponseDTO(false, null, "Access is denied");
         response.setStatus(HttpStatus.FORBIDDEN.value());
         response.setContentType("application/json");

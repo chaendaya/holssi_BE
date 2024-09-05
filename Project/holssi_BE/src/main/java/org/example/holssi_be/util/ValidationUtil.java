@@ -1,5 +1,6 @@
 package org.example.holssi_be.util;
 
+import org.example.holssi_be.exception.IllegalException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -16,7 +17,7 @@ public class ValidationUtil {
             String errorMessage = bindingResult.getAllErrors().stream()
                     .map(DefaultMessageSourceResolvable::getDefaultMessage)
                     .collect(Collectors.joining(", "));
-            throw new IllegalArgumentException("Validation failed: " + errorMessage);
+            throw new IllegalException("Validation failed: " + errorMessage);
         }
     }
 }
