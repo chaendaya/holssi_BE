@@ -36,7 +36,8 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))  // CORS 설정 추가
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/index.html", "/favicon.ico",
-                                "/api/auth/**", "/api/login", "/api/admin/create", "/h2-console", "/h2-console/**", "/api/temp/**", "/api/refresh-token", "/api/garbages/getValue").permitAll()
+                                "/api/auth/**", "/api/login", "/api/admin/create", "/h2-console", "/h2-console/**", "/api/temp/**", "/api/garbages/getValue").permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -72,13 +73,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("*");
-        /*configuration.addAllowedOrigin("http://localhost:5173");
-        configuration.addAllowedOrigin("http://localhost:8081");*/
+        configuration.addAllowedOrigin("https://waste-bank-web-eight.vercel.app/");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.addExposedHeader("Authorization");
-        // configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

@@ -41,15 +41,15 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             "/h2-console",
             "/h2-console/.*",
             "/api/temp/.*",
-            "/api/refresh-token",
             "/api/garbages/getValue"
     );
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        String requestURI = request.getRequestURI();
+
         // JWT 필터를 적용하지 않을 경로 확인
+        String requestURI = request.getRequestURI();
         if (shouldExclude(requestURI)) {
             // 필터를 적용하지 않고 요청을 다음 필터로 전달
             chain.doFilter(request, response);
